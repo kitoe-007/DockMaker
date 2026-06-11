@@ -7,6 +7,7 @@ import pymupdf
 import pytesseract
 import cv2
 import numpy as np
+import json
 
 from PIL import Image
 
@@ -67,3 +68,9 @@ class PDF_extractor:
                     except Exception as e:
                         print(f"Ошибка OCR на стр.{page_num}: {e}")
         return text_from_pages
+
+if __name__ == "__main__":
+    extractor = PDF_extractor()
+    input_file = sys.argv[1]
+    result = extractor.get_images_pymupdf(input_file)
+    print(json.dumps(result, ensure_ascii=False))
