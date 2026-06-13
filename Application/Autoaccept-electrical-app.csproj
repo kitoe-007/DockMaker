@@ -97,5 +97,17 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="baricada.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="static\images\doc_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="static\images\data_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="static\images\set_icon.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

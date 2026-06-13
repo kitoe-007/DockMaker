@@ -30,7 +30,8 @@ namespace Autoaccept_electrical_app
         private void Button_extract_data_from_file_Click(object sender, RoutedEventArgs e)
         {
             var extractor = new launch_and_data_extraction();
-            string a = extractor.launch_script("C:\\Users\\user\\Desktop\\работа\\Заготовки\\извлечение PDF\\py\\.venv\\Scripts\\python.exe", "C:\\Users\\user\\Desktop\\работа\\Заготовки\\извлечение PDF\\py\\PDF_extractor.py", "C:\\Users\\user\\Desktop\\работа\\Заготовки\\извлечение PDF\\py\\files\\test.pdf");
+            //string a = extractor.launch_script("C:\\Users\\user\\Desktop\\работа\\Заготовки\\извлечение PDF\\py\\.venv\\Scripts\\python.exe", "C:\\Users\\user\\Desktop\\работа\\Заготовки\\извлечение PDF\\py\\PDF_extractor.py", "C:\\Users\\user\\Desktop\\работа\\Заготовки\\извлечение PDF\\py\\files\\test.pdf", "text");
+            string a = extractor.launch_script("C:\\Users\\user\\Desktop\\работа\\Приложения\\Паша\\git\\autoaccept-electrical\\File_extractors\\PDF_extractor\\.venv\\python.exe", "C:\\Users\\user\\Desktop\\работа\\Приложения\\Паша\\git\\autoaccept-electrical\\File_extractors\\XLSX_extractor.py", "C:\\Users\\user\\Desktop\\работа\\Заготовки\\извлечение PDF\\py\\files\\Excel.xlsx");
             Console.WriteLine(a);
             lab.Content = a;
         }

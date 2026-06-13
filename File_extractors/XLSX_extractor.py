@@ -3,6 +3,7 @@ import pandas as pd
 import io
 import openpyxl
 import json
+import datetime
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
@@ -24,11 +25,25 @@ class XLSX_extractor:
     def cut(self, df, beg=0, end=0):
         return df[beg:len(df)-end]
 
+    def convert_to_dict(self, df):
+        result = {}
+        for ind, headers in enumerate(df[0]):
+            result[headers] = []
+            for row in df[1:]:
+                elem = row[ind]
+                if isinstance(elem, (pd.Timestamp, datetime.datetime)):
+                    result[headers].append(str(elem)[:-9])
+                    continue
+                result[headers].append(elem)
+        return result
+
+
 if __name__ == "__main__":
     extractor = XLSX_extractor()
     input_file = sys.argv[1]
     result = extractor.extract(input_file)
     if len(sys.argv) > 2 and sys.argv[2] == "cut":
         result = extractor.cut(result, beg=int(sys.argv[3]), end=int(sys.argv[4]))
-    #print(json.dumps(result, ensure_ascii=False))
-    print(result)
+    result = extractor.convert_to_dict(result)
+    print(json.dumps(result, ensure_ascii=False))
+
