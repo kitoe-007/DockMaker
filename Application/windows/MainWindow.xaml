@@ -170,13 +170,40 @@
                 </Button>
             </Grid>
         </Border>
-        <Border Margin="693,67,0,0" BorderBrush="DarkGray" BorderThickness="1">
-            <StackPanel>
-                <Label Content="РАЗДЕЛ 3" HorizontalAlignment="Center" FontWeight="Bold" FontSize="24" Name="test"/>
-                <DataGrid Height="416" Width="348" Name="DocDataGrid" MinRowHeight="25" />
-
-
-            </StackPanel>
+        <Border Margin="405,67,0,0" BorderBrush="DarkGray" BorderThickness="1">
+            <StackPanel Orientation="Horizontal">
+                    <StackPanel Height="520" Width="289" HorizontalAlignment="Left">
+                        <Border Height="54" Width="280" BorderBrush="DarkGray" BorderThickness="1, 0, 1, 1" CornerRadius="2" >
+                            <Label Content="Параметры" Margin="0,0,108,0"/>
+                        </Border>
+                        <StackPanel Height="457" Width="280">
+                            <UIElement.RenderTransform>
+                                <TransformGroup>
+                                    <ScaleTransform/>
+                                    <SkewTransform/>
+                                    <RotateTransform/>
+                                    <TranslateTransform/>
+                                </TransformGroup>
+                            </UIElement.RenderTransform>
+                            <Label Content="Источник данных" Height="28"/>
+                            <StackPanel Orientation="Horizontal" Height="32" >
+                                <ComboBox Height="24" Width="184" Margin="4, 0, 0, 0" Name="DataSourceFileComboBox"
+                                          ItemsSource="{Binding DataSourceFiles}"
+                                          DisplayMemberPath="FileName"
+                                          SelectedValuePath="FullPath"/>
+                                <Button Width="24" Height="24" Margin="4" Click="ChooseFileSourceButton_Click">
+                                    
+                                </Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel Margin="0,0,0,0" Width="410" Height="520">
+                        <Border Height="54" Width="400" BorderBrush="DarkGray" BorderThickness="1, 0, 1, 1" CornerRadius="2" VerticalAlignment="Top" >
+                            <Label Content="Предпросмотр"/>
+                        </Border>
+                        <DataGrid Height="466" Width="400" Name="DocDataGrid" MinRowHeight="25" />
+                    </StackPanel>
+                </StackPanel>
         </Border>
     </Grid>
     </Border>

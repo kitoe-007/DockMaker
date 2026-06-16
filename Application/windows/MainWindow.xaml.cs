@@ -13,11 +13,13 @@ namespace Autoaccept_electrical_app
   public partial class MainWindow : Window
   {
     public ObservableCollection<TreeNode> Folders { get; set; }
+    public ObservableCollection<DataSourceFileItem> DataSourceFiles { get; set; }
 
     public MainWindow()
     {
       InitializeComponent();
       Folders = BuildTemplateTree();
+      DataSourceFiles = new ObservableCollection<DataSourceFileItem>();
       DataContext = this;
     }
 
@@ -92,22 +94,25 @@ namespace Autoaccept_electrical_app
 
         private void GenerateDocButton_Click(object sender, RoutedEventArgs e)
         {
-            // Если DataGrid работал через ItemsSource, трогать Items нельзя (иначе InvalidOperationException).
             DocDataGrid.ItemsSource = null;
             Json_to_array_convertor js_con = new Json_to_array_convertor();
             launch_and_data_extraction launch_script = new launch_and_data_extraction();
 
             string pythonExe = @"C:\Users\user\Desktop\работа\Приложения\Паша\git\autoaccept-electrical\File_extractors\.venv\Scripts\python.exe";
             string extractorPy = @"C:\Users\user\Desktop\работа\Приложения\Паша\git\autoaccept-electrical\File_extractors\XLSX_extractor.py";
-            string xlsx = @"C:\Users\user\Desktop\работа\Приложения\Паша\git\autoaccept-electrical\Application\data\Excel.xlsx";
+            string xlsx = DataSourceFileComboBox.SelectedValue as string;
+            if (xlsx == null) 
+            {
+                MessageBox.Show("Не выбран источник данных.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            } 
             string json = launch_script.launch_script(pythonExe, extractorPy, xlsx);
             if (string.IsNullOrWhiteSpace(json) || json.Trim() == "Ошибки")
             {
                 MessageBox.Show("Не удалось получить данные из Excel. Проверьте путь к Python/.venv и файлу Excel.xlsx.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            // ConvertJsonToStringArray возвращает столбцы (column_0, column_1, ...)
-            // Для DataGrid нужны строки: соберём их, используя первую строку как заголовки.
+
             List<List<string>> columns = js_con.ConvertJsonToStringArray(json);
             if (columns.Count == 0)
             {
@@ -130,14 +135,12 @@ namespace Autoaccept_electrical_app
                 return string.IsNullOrWhiteSpace(h) ? $"column_{i}" : h.Trim();
             }).ToList();
 
-            // DataGrid надёжнее всего работает с DataView/DataTable.
             var table = new DataTable();
             var used = new HashSet<string>();
             for (int c = 0; c < headers.Count; c++)
             {
                 string name = headers[c];
                 if (string.IsNullOrWhiteSpace(name)) name = $"column_{c}";
-                // гарантируем уникальность имён колонок
                 string baseName = name;
                 int k = 2;
                 while (used.Contains(name))
@@ -162,6 +165,19 @@ namespace Autoaccept_electrical_app
             }
 
             DocDataGrid.ItemsSource = table.DefaultView;
+        }
+
+        private void ChooseFileSourceButton_Click(object sender, RoutedEventArgs e)
+        {
+            Dialogs dialog_manager = new Dialogs();
+            if (!dialog_manager.OpenFileDialog())
+                return;
+
+            string filePath = dialog_manager.FilePath;
+            if (!DataSourceFiles.Any(f => f.FullPath == filePath))
+                DataSourceFiles.Add(new DataSourceFileItem(filePath));
+
+            DataSourceFileComboBox.SelectedValue = filePath;
         }
     }
 }
