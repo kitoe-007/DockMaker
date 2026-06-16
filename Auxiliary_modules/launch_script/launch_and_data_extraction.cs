@@ -33,7 +33,7 @@ namespace Autoaccept_electrical_app.auxiliary_modules
                 p.StartInfo.FileName = Script_path;
                 p.StartInfo.Arguments = arguments;
 
-                p.StartInfo.UseShellExecute = false;      // перенаправления - false = Да
+                p.StartInfo.UseShellExecute = false;       // перенаправления - false = Да
                 p.StartInfo.RedirectStandardOutput = true; // перенаправить stdout
                 p.StartInfo.RedirectStandardError = true;  // для ошибок
                 p.StartInfo.CreateNoWindow = true;         // скрыть окно консоли

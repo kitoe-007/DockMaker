@@ -25,16 +25,18 @@ class XLSX_extractor:
     def cut(self, df, beg=0, end=0):
         return df[beg:len(df)-end]
 
-    def convert_to_dict(self, df):
-        result = {}
-        for ind, headers in enumerate(df[0]):
-            result[headers] = []
-            for row in df[1:]:
+    def convert_to_dict(self, df): # формат json {количество_столбцов:число, столбец0:список_всех_элементов_столбца0, столбец1:список_всех_элементов_столбца1, ... столбецN:список_всех_элементов_столбцаN}
+        table_length = len(df[0])
+        result = {"number_of_columns": table_length}
+
+        for ind in range(len(df[0])):
+            result[f"column_{ind}"] = []
+            for row in df:
                 elem = row[ind]
                 if isinstance(elem, (pd.Timestamp, datetime.datetime)):
-                    result[headers].append(str(elem)[:-9])
+                    result[f"column_{ind}"].append(str(elem)[:-9])
                     continue
-                result[headers].append(elem)
+                result[f"column_{ind}"].append(elem)
         return result
 
 

@@ -1,0 +1,183 @@
+﻿<Window x:Class="Autoaccept_electrical_app.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Autoaccept_electrical_app"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="600" Width="1100"
+        FontFamily="Segoe UI">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        <Style x:Key="FolderIconStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="#5F6368"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsFolder}" Value="False">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="TemplateTreeViewItem" TargetType="TreeViewItem">
+            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+            <Setter Property="Padding" Value="4,6"/>
+            <Setter Property="Margin" Value="0,1"/>
+            <Setter Property="Foreground" Value="#202124"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <EventSetter Event="PreviewMouseLeftButtonDown" Handler="TreeViewItem_PreviewMouseLeftButtonDown"/>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#D2E3FC"/>
+                    <Setter Property="FontWeight" Value="SemiBold"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#F1F3F4"/>
+                </Trigger>
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsSelected" Value="True"/>
+                        <Condition Property="IsMouseOver" Value="True"/>
+                    </MultiTrigger.Conditions>
+                    <Setter Property="Background" Value="#D2E3FC"/>
+                </MultiTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <HierarchicalDataTemplate DataType="{x:Type local:TreeNode}"
+                                  ItemsSource="{Binding Children}">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Style="{StaticResource FolderIconStyle}" Text="&#xE8B7;"/>
+                <Image Source="/static/images/document-icon.png"
+                       Width="16" Height="16"
+                       Margin="0,0,8,0"
+                       VerticalAlignment="Center">
+                    <Image.Style>
+                        <Style TargetType="Image">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsFolder}" Value="False">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Image.Style>
+                </Image>
+                <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+            </StackPanel>
+        </HierarchicalDataTemplate>
+    </Window.Resources>
+    <Border BorderBrush="DarkGray" BorderThickness="0, 1, 0, 0">
+    <Grid>
+        <StackPanel Width="120" HorizontalAlignment="Left" Background="#FF0C305D">
+            <Button HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalContentAlignment="Right" Margin="10,15,0,0" Width="100" Height="36" Background="#FF0F3B78"
+                    BorderBrush="White" BorderThickness="1">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/static/images/document-icon.png" Width="20" Height="20" OpacityMask="White"/>
+                    <TextBlock Text="Документы" Margin="5,0,5,0" Foreground="White" FontWeight="Bold"/>
+                </StackPanel>
+            </Button>
+            <Button HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalContentAlignment="Right" Margin="10,15,0,0" Width="100" Height="36" Background="#FF0F3B78"
+                    BorderBrush="White" BorderThickness="1">
+                <StackPanel Orientation="Horizontal" Width="100">
+                    <Image Source="/static/images/data-icon.png" Width="24" Height="24"/>
+                    <TextBlock Text="Данные" Margin="5,5,0,0" Foreground="White" FontWeight="Bold" Width="100"/>
+                </StackPanel>
+            </Button>
+            <Button HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalContentAlignment="Right" Margin="10,15,0,0" Width="100" Height="36" Background="#FF0F3B78"
+                    BorderBrush="White" BorderThickness="1">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/static/images/settings-icon.png" Width="24" Height="24"/>
+                    <TextBlock Text="Настройки" Margin="5,5,5,0" Foreground="White" FontWeight="Bold"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+
+        <StackPanel RenderTransformOrigin="0.495,0.379" Margin="125,10,0,317">
+            <Button Background="#FF135FD6" Height="38" Width="161" HorizontalAlignment="Right" Margin="0,0,10,0">
+                <TextBlock Text="Сгенерировать документ" Foreground="White" FontWeight="Bold"/>
+            </Button>
+        </StackPanel>
+
+        <Border Margin="120,0,0,0" Width="280" HorizontalAlignment="Left"
+                BorderBrush="#DADCE0" BorderThickness="0,0,1,0" Background="White">
+            <Grid Margin="16,12,16,12">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="Шаблоны" FontWeight="Bold" FontSize="22" Margin="0,0,0,12"/>
+
+                <Button Grid.Row="1" Background="#FF135FD6" Height="38" HorizontalAlignment="Stretch" Margin="0,0,0,12" BorderThickness="0" Cursor="Hand">
+                    <TextBlock Text="+ Создать шаблон" Foreground="White" FontWeight="SemiBold" FontSize="13"/>
+                </Button>
+
+                <Border Grid.Row="2" BorderBrush="#DADCE0" BorderThickness="1" CornerRadius="4" Margin="0,0,0,12" Background="#F8F9FA">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="&#xE721;" FontFamily="Segoe MDL2 Assets"
+                                   Foreground="#9AA0A6" Margin="10,0,6,0" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="1" BorderThickness="0" Background="Transparent"
+                                 VerticalAlignment="Center" Padding="0,8"
+                                 Foreground="#5F6368" FontSize="13">
+                            <TextBox.Style>
+                                <Style TargetType="TextBox">
+                                    <Style.Triggers>
+                                        <Trigger Property="Text" Value="">
+                                            <Setter Property="Background">
+                                                <Setter.Value>
+                                                    <VisualBrush AlignmentX="Left" AlignmentY="Center" Stretch="None">
+                                                        <VisualBrush.Visual>
+                                                            <TextBlock Text="Поиск шаблонов" Foreground="#9AA0A6" FontSize="13" Margin="0,0,8,0"/>
+                                                        </VisualBrush.Visual>
+                                                    </VisualBrush>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBox.Style>
+                        </TextBox>
+                    </Grid>
+                </Border>
+
+                <TreeView Grid.Row="3"
+                          ItemsSource="{Binding Folders}"
+                          BorderThickness="0"
+                          Background="Transparent"
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                          ItemContainerStyle="{StaticResource TemplateTreeViewItem}"/>
+
+                <Button Grid.Row="4" Height="36" Margin="0,12,0,0" HorizontalAlignment="Stretch"
+                        Background="Transparent" BorderBrush="#DADCE0" BorderThickness="1" Cursor="Hand">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE898;" FontFamily="Segoe MDL2 Assets" Foreground="#5F6368" Margin="0,0,8,0"/>
+                        <TextBlock Text="Импортировать шаблон" Foreground="#5F6368" FontSize="13"/>
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Border>
+        <Border Margin="693,67,0,0" BorderBrush="DarkGray" BorderThickness="1">
+            <StackPanel>
+                <Label Content="РАЗДЕЛ 3" HorizontalAlignment="Center" FontWeight="Bold" FontSize="24"/>
+                <DataGrid Height="416" d:ItemsSource="{d:SampleData ItemCount=5}" Width="348"/>
+
+
+            </StackPanel>
+        </Border>
+    </Grid>
+    </Border>
+</Window>
