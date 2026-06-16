@@ -92,6 +92,7 @@
     </Page>
     <Compile Include="classes\Dialogs.cs" />
     <Compile Include="classes\Json_to_array_convertor.cs" />
+    <Compile Include="templates\OJR_template.cs" />
     <Compile Include="windows\App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -124,7 +125,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="data\Excel.xlsx" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -142,17 +142,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="static\images\settings-icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="data\Временно.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Временно.txt</LastGenOutput>
-    </Content>
-    <Resource Include="data\Временно.txt">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Временно.tt</DependentUpon>
-    </Resource>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
