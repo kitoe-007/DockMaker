@@ -1,4 +1,9 @@
-﻿using System.Collections.ObjectModel;
+﻿using Autoaccept_electrical_app.auxiliary_modules;
+using Autoaccept_electrical_app.classes;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Data;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -12,8 +17,8 @@ namespace Autoaccept_electrical_app
     public MainWindow()
     {
       InitializeComponent();
-      DataContext = this;
       Folders = BuildTemplateTree();
+      DataContext = this;
     }
 
     private static ObservableCollection<TreeNode> BuildTemplateTree()
@@ -84,5 +89,79 @@ namespace Autoaccept_electrical_app
         e.Handled = true;
       }
     }
-  }
+
+        private void GenerateDocButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Если DataGrid работал через ItemsSource, трогать Items нельзя (иначе InvalidOperationException).
+            DocDataGrid.ItemsSource = null;
+            Json_to_array_convertor js_con = new Json_to_array_convertor();
+            launch_and_data_extraction launch_script = new launch_and_data_extraction();
+
+            string pythonExe = @"C:\Users\user\Desktop\работа\Приложения\Паша\git\autoaccept-electrical\File_extractors\.venv\Scripts\python.exe";
+            string extractorPy = @"C:\Users\user\Desktop\работа\Приложения\Паша\git\autoaccept-electrical\File_extractors\XLSX_extractor.py";
+            string xlsx = @"C:\Users\user\Desktop\работа\Приложения\Паша\git\autoaccept-electrical\Application\data\Excel.xlsx";
+            string json = launch_script.launch_script(pythonExe, extractorPy, xlsx);
+            if (string.IsNullOrWhiteSpace(json) || json.Trim() == "Ошибки")
+            {
+                MessageBox.Show("Не удалось получить данные из Excel. Проверьте путь к Python/.venv и файлу Excel.xlsx.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            // ConvertJsonToStringArray возвращает столбцы (column_0, column_1, ...)
+            // Для DataGrid нужны строки: соберём их, используя первую строку как заголовки.
+            List<List<string>> columns = js_con.ConvertJsonToStringArray(json);
+            if (columns.Count == 0)
+            {
+                string preview = json.Trim();
+                if (preview.Length > 800) preview = preview.Substring(0, 800) + "...";
+                MessageBox.Show("Excel прочитан, но данные не найдены.\n\nПервые символы вывода Python:\n" + preview, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            int rowCount = columns.Max(c => c?.Count ?? 0);
+            if (rowCount <= 1)
+            {
+                MessageBox.Show("В Excel нет строк данных (есть только заголовок или пусто).", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var headers = columns.Select((col, i) =>
+            {
+                var h = (col != null && col.Count > 0) ? col[0] : null;
+                return string.IsNullOrWhiteSpace(h) ? $"column_{i}" : h.Trim();
+            }).ToList();
+
+            // DataGrid надёжнее всего работает с DataView/DataTable.
+            var table = new DataTable();
+            var used = new HashSet<string>();
+            for (int c = 0; c < headers.Count; c++)
+            {
+                string name = headers[c];
+                if (string.IsNullOrWhiteSpace(name)) name = $"column_{c}";
+                // гарантируем уникальность имён колонок
+                string baseName = name;
+                int k = 2;
+                while (used.Contains(name))
+                {
+                    name = $"{baseName}_{k}";
+                    k++;
+                }
+                used.Add(name);
+                headers[c] = name;
+                table.Columns.Add(name, typeof(string));
+            }
+
+            for (int r = 1; r < rowCount; r++)
+            {
+                var row = table.NewRow();
+                for (int c = 0; c < columns.Count; c++)
+                {
+                    string value = (columns[c] != null && columns[c].Count > r) ? columns[c][r] : "";
+                    row[headers[c]] = value ?? "";
+                }
+                table.Rows.Add(row);
+            }
+
+            DocDataGrid.ItemsSource = table.DefaultView;
+        }
+    }
 }

@@ -122,6 +122,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="data\Excel.xlsx" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -139,6 +140,20 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="static\images\settings-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="data\Временно.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Временно.txt</LastGenOutput>
+    </Content>
+    <Resource Include="data\Временно.txt">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Временно.tt</DependentUpon>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets" Condition="Exists('packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" />

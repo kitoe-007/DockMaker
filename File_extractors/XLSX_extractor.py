@@ -33,6 +33,11 @@ class XLSX_extractor:
             result[f"column_{ind}"] = []
             for row in df:
                 elem = row[ind]
+                # System.Text.Json не умеет читать NaN/Infinity как валидный JSON.
+                # Конвертируем отсутствующие значения (NaN/NaT) в None -> null.
+                if pd.isna(elem):
+                    result[f"column_{ind}"].append(None)
+                    continue
                 if isinstance(elem, (pd.Timestamp, datetime.datetime)):
                     result[f"column_{ind}"].append(str(elem)[:-9])
                     continue
