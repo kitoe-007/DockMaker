@@ -16,6 +16,7 @@ namespace Autoaccept_electrical_app
     public ObservableCollection<TreeNode> Folders { get; set; }
     public ObservableCollection<DataSourceFileItem> DataSourceFiles { get; set; }
 
+    private FileClass _current_file = new FileClass();
     public MainWindow()
     {
       InitializeComponent();
@@ -98,7 +99,18 @@ namespace Autoaccept_electrical_app
             DocDataGrid.ItemsSource = null;
             Json_to_array_convertor js_con = new Json_to_array_convertor();
             launch_and_data_extraction launch_script = new launch_and_data_extraction();
+            
+            int cut_top = 0;
+            int cut_bottom = 0;
+            
+            if (Numeric_up_down_cut_bottom.Text.All(char.IsDigit)) {
+                cut_top = int.Parse(Numeric_up_down_cut_bottom.Text);
+            }
 
+            if (Numeric_up_down_cut_bottom.Text.All(char.IsDigit))
+            {
+                cut_bottom = int.Parse(Numeric_up_down_cut_bottom.Text);
+            }
             string pythonExe = @"C:\Users\user\Desktop\работа\Приложения\Паша\git\autoaccept-electrical\File_extractors\.venv\Scripts\python.exe";
             string extractorPy = @"C:\Users\user\Desktop\работа\Приложения\Паша\git\autoaccept-electrical\File_extractors\XLSX_extractor.py";
             string xlsx = DataSourceFileComboBox.SelectedValue as string;
@@ -114,8 +126,8 @@ namespace Autoaccept_electrical_app
                 return;
             }
 
-            List<List<string>> columns = js_con.ConvertJsonToStringArray(json);
-            if (columns.Count == 0)
+            _current_file.json_data = js_con.ConvertJsonToStringArray(json);
+            if (_current_file.json_data.Count == 0)
             {
                 string preview = json.Trim();
                 if (preview.Length > 800) preview = preview.Substring(0, 800) + "...";
@@ -123,7 +135,7 @@ namespace Autoaccept_electrical_app
                 return;
             }
 
-            int rowCount = columns.Max(c => c?.Count ?? 0);
+            int rowCount = _current_file.json_data.Max(c => c?.Count ?? 0);
             if (rowCount <= 1)
             {
                 MessageBox.Show("В Excel нет строк данных (есть только заголовок или пусто).", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -131,7 +143,7 @@ namespace Autoaccept_electrical_app
             }
 
             OJR_template ojr_tem = new OJR_template();
-            ojr_tem.create_table(DocDataGrid, columns);
+            ojr_tem.create_table(DocDataGrid, _current_file.json_data, cut_top, cut_bottom);
         }
 
         private void ChooseFileSourceButton_Click(object sender, RoutedEventArgs e)
@@ -145,6 +157,62 @@ namespace Autoaccept_electrical_app
                 DataSourceFiles.Add(new DataSourceFileItem(filePath));
 
             DataSourceFileComboBox.SelectedValue = filePath;
+        }
+
+        private void Numeric_top_up_button_Click(object sender, RoutedEventArgs e)
+        {
+            bool isOnlyDigits = Numeric_up_down_cut_top.Text.All(char.IsDigit);
+            if (isOnlyDigits) {
+                int value = int.Parse(Numeric_up_down_cut_top.Text);
+                Numeric_up_down_cut_top.Text = (value+1).ToString();
+            }
+            else
+            {
+                Numeric_up_down_cut_top.Text = "0";
+            }
+            
+        }
+
+        private void Numeric_top_down_button_Click(object sender, RoutedEventArgs e)
+        {
+            bool isOnlyDigits = Numeric_up_down_cut_top.Text.All(char.IsDigit);
+            if (isOnlyDigits)
+            {
+                int value = int.Parse(Numeric_up_down_cut_top.Text);
+                Numeric_up_down_cut_top.Text = (value - 1).ToString();
+            }
+            else
+            {
+                Numeric_up_down_cut_top.Text = "0";
+            }
+        }
+
+        private void Numeric_bottom_up_button_Click(object sender, RoutedEventArgs e)
+        {
+            bool isOnlyDigits = Numeric_up_down_cut_bottom.Text.All(char.IsDigit);
+            if (isOnlyDigits)
+            {
+                int value = int.Parse(Numeric_up_down_cut_bottom.Text);
+                Numeric_up_down_cut_bottom.Text = (value + 1).ToString();
+            }
+            else
+            {
+                Numeric_up_down_cut_bottom.Text = "0";
+            }
+        }
+
+        private void Numeric_bottom_down_button_Click(object sender, RoutedEventArgs e)
+        {
+            bool isOnlyDigits = Numeric_up_down_cut_bottom.Text.All(char.IsDigit);
+            if (isOnlyDigits)
+            {
+                int value = int.Parse(Numeric_up_down_cut_bottom.Text);
+                Numeric_up_down_cut_bottom.Text = (value - 1).ToString();
+            }
+            else
+            {
+                Numeric_up_down_cut_bottom.Text = "0";
+            }
         }
     }
 }

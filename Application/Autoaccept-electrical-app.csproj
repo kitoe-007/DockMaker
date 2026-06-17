@@ -91,6 +91,7 @@
       <SubType>Designer</SubType>
     </Page>
     <Compile Include="classes\Dialogs.cs" />
+    <Compile Include="classes\FileClass.cs" />
     <Compile Include="classes\Json_to_array_convertor.cs" />
     <Compile Include="templates\OJR_template.cs" />
     <Compile Include="windows\App.xaml.cs">

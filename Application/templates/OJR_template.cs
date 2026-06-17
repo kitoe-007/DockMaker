@@ -66,5 +66,33 @@ namespace Autoaccept_electrical_app.templates
             dg.ItemsSource = table.DefaultView;
             set_headers(dg);
         }
+
+        public void create_table(DataGrid dg, List<List<string>> data, int cut_top, int cut_bottom)
+        {
+            clear_table(dg);
+
+            if (data == null || data.Count < 5 || data[0] == null || data[4] == null || data[0].Count < 2)
+                return;
+
+            var table = new DataTable();
+            table.Columns.Add("column_0", typeof(string));
+            table.Columns.Add("column_1", typeof(string));
+            table.Columns.Add("column_2", typeof(string));
+            table.Columns.Add("column_3", typeof(string));
+
+            for (int i = 1+cut_top; i < data[0].Count-cut_bottom; i++)
+            {
+                var row = table.NewRow();
+                row[0] = (i - cut_top).ToString();
+                row[1] = i < data[0].Count ? (data[0][i] ?? "") : "";
+                row[2] = i < data[4].Count ? (data[4][i] ?? "") : "";
+                row[3] = "";
+                table.Rows.Add(row);
+            }
+
+            dg.AutoGenerateColumns = true;
+            dg.ItemsSource = table.DefaultView;
+            set_headers(dg);
+        }
     }
 }
