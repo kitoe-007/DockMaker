@@ -14,6 +14,10 @@ namespace Autoaccept_electrical_app.templates
 
         private void set_headers(DataGrid dg)
         {
+            // Колонки создаются после установки ItemsSource (AutoGenerateColumns).
+            // Если вызвали set_headers слишком рано, будет IndexOutOfRangeException.
+            if (dg.Columns.Count < 4) return;
+
             dg.Columns[0].Header = "№/пп";
             dg.Columns[1].Header = "Дата выполнения работ";
             dg.Columns[2].Header = "Наименование работ, выполняемых в процессе строительства,\n реконструкции, капитального ремонта объекта капитального строительства";
@@ -80,15 +84,47 @@ namespace Autoaccept_electrical_app.templates
             table.Columns.Add("column_2", typeof(string));
             table.Columns.Add("column_3", typeof(string));
 
-            for (int i = 1+cut_top; i < data[0].Count-cut_bottom; i++)
+         
+            int ind = 0;
+            DataRow currentRow = null;
+
+            int start = 1 + cut_top;
+            int endExclusive = data[0].Count - cut_bottom; // обрезаем cut_bottom строк с конца
+            if (start < 1) start = 1;
+            if (endExclusive < start) endExclusive = start;
+
+            for (int i = start; i < endExclusive; i++)
             {
-                var row = table.NewRow();
-                row[0] = (i - cut_top).ToString();
-                row[1] = i < data[0].Count ? (data[0][i] ?? "") : "";
-                row[2] = i < data[4].Count ? (data[4][i] ?? "") : "";
-                row[3] = "";
-                table.Rows.Add(row);
+                string dateVal = i < data[0].Count ? (data[0][i] ?? "") : "";
+                string nameVal = i < data[4].Count ? (data[4][i] ?? "") : "";
+
+                if (!string.IsNullOrEmpty(dateVal))
+                {
+                    // Закрываем предыдущую группу (если она была).
+                    if (currentRow != null)
+                        table.Rows.Add(currentRow);
+
+                    ind++;
+                    currentRow = table.NewRow();
+                    currentRow[0] = ind.ToString();
+                    currentRow[1] = dateVal;
+                    currentRow[2] = "";
+                    currentRow[3] = "";
+                }
+
+                // До первой даты нечего группировать.
+                if (currentRow == null)
+                    continue;
+
+                if (!string.IsNullOrEmpty(nameVal))
+                {
+                    string prev = currentRow[2]?.ToString() ?? "";
+                    currentRow[2] = string.IsNullOrEmpty(prev) ? nameVal : prev + ",\n " + nameVal;
+                }
             }
+
+            if (currentRow != null)
+                table.Rows.Add(currentRow);
 
             dg.AutoGenerateColumns = true;
             dg.ItemsSource = table.DefaultView;

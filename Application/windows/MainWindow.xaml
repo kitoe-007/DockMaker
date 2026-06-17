@@ -201,7 +201,7 @@
 
                                 <Button Width="24" Height="24" Margin="4" Content="↑" Name="Numeric_top_up_button" Click="Numeric_top_up_button_Click"/>
                                 <Button Width="24" Height="24" Margin="4" Content="↓" Name="Numeric_top_down_button" Click="Numeric_top_down_button_Click"/>
-                                <Label Margin="4" Content="Оббрезать сверху" Height="28"></Label>
+                                <Label Margin="4" Content="Обрезать сверху" Height="28"></Label>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Height="32" >
                                 <TextBox Width="80" Height="24" Margin="4, 0, 0, 0" Text="0" Name="Numeric_up_down_cut_bottom"></TextBox>

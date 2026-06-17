@@ -102,15 +102,16 @@ namespace Autoaccept_electrical_app
             
             int cut_top = 0;
             int cut_bottom = 0;
-            
-            if (Numeric_up_down_cut_bottom.Text.All(char.IsDigit)) {
-                cut_top = int.Parse(Numeric_up_down_cut_bottom.Text);
-            }
 
-            if (Numeric_up_down_cut_bottom.Text.All(char.IsDigit))
-            {
-                cut_bottom = int.Parse(Numeric_up_down_cut_bottom.Text);
-            }
+            // TextBox может быть пустым (например, cut_bottom), поэтому только int.TryParse
+            // чтобы не ловить исключение при int.Parse("").
+            if (!int.TryParse(Numeric_up_down_cut_top.Text, out cut_top))
+                cut_top = 0;
+            if (!int.TryParse(Numeric_up_down_cut_bottom.Text, out cut_bottom))
+                cut_bottom = 0;
+
+            if (cut_top < 0) cut_top = 0;
+            if (cut_bottom < 0) cut_bottom = 0;
             string pythonExe = @"C:\Users\user\Desktop\работа\Приложения\Паша\git\autoaccept-electrical\File_extractors\.venv\Scripts\python.exe";
             string extractorPy = @"C:\Users\user\Desktop\работа\Приложения\Паша\git\autoaccept-electrical\File_extractors\XLSX_extractor.py";
             string xlsx = DataSourceFileComboBox.SelectedValue as string;
@@ -143,7 +144,19 @@ namespace Autoaccept_electrical_app
             }
 
             OJR_template ojr_tem = new OJR_template();
-            ojr_tem.create_table(DocDataGrid, _current_file.json_data, cut_top, cut_bottom);
+            try
+            {
+                ojr_tem.create_table(DocDataGrid, _current_file.json_data, cut_top, cut_bottom);
+            }
+            catch (System.Exception ex)
+            {
+                MessageBox.Show(
+                    "Ошибка при создании таблицы:\n\n" + ex.ToString(),
+                    "Критическая ошибка",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error
+                );
+            }
         }
 
         private void ChooseFileSourceButton_Click(object sender, RoutedEventArgs e)
