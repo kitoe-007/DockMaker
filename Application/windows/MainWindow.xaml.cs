@@ -1,5 +1,6 @@
 ﻿using Autoaccept_electrical_app.auxiliary_modules;
 using Autoaccept_electrical_app.classes;
+using Autoaccept_electrical_app.templates;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
@@ -129,42 +130,8 @@ namespace Autoaccept_electrical_app
                 return;
             }
 
-            var headers = columns.Select((col, i) =>
-            {
-                var h = (col != null && col.Count > 0) ? col[0] : null;
-                return string.IsNullOrWhiteSpace(h) ? $"column_{i}" : h.Trim();
-            }).ToList();
-
-            var table = new DataTable();
-            var used = new HashSet<string>();
-            for (int c = 0; c < headers.Count; c++)
-            {
-                string name = headers[c];
-                if (string.IsNullOrWhiteSpace(name)) name = $"column_{c}";
-                string baseName = name;
-                int k = 2;
-                while (used.Contains(name))
-                {
-                    name = $"{baseName}_{k}";
-                    k++;
-                }
-                used.Add(name);
-                headers[c] = name;
-                table.Columns.Add(name, typeof(string));
-            }
-
-            for (int r = 1; r < rowCount; r++)
-            {
-                var row = table.NewRow();
-                for (int c = 0; c < columns.Count; c++)
-                {
-                    string value = (columns[c] != null && columns[c].Count > r) ? columns[c][r] : "";
-                    row[headers[c]] = value ?? "";
-                }
-                table.Rows.Add(row);
-            }
-
-            DocDataGrid.ItemsSource = table.DefaultView;
+            OJR_template ojr_tem = new OJR_template();
+            ojr_tem.create_table(DocDataGrid, columns);
         }
 
         private void ChooseFileSourceButton_Click(object sender, RoutedEventArgs e)
