@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Autoaccept_electrical_app.classes;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -69,9 +70,10 @@ namespace Autoaccept_electrical_app.templates
             dg.AutoGenerateColumns = true;
             dg.ItemsSource = table.DefaultView;
             set_headers(dg);
+            
         }
 
-        public void create_table(DataGrid dg, List<List<string>> data, int cut_top, int cut_bottom)
+        public void create_table(DataGrid dg, List<List<string>> data, int cut_top, int cut_bottom, FileClass current_file)
         {
             clear_table(dg);
 
@@ -100,7 +102,6 @@ namespace Autoaccept_electrical_app.templates
 
                 if (!string.IsNullOrEmpty(dateVal))
                 {
-                    // Закрываем предыдущую группу (если она была).
                     if (currentRow != null)
                         table.Rows.Add(currentRow);
 
@@ -112,7 +113,6 @@ namespace Autoaccept_electrical_app.templates
                     currentRow[3] = "";
                 }
 
-                // До первой даты нечего группировать.
                 if (currentRow == null)
                     continue;
 
@@ -129,6 +129,7 @@ namespace Autoaccept_electrical_app.templates
             dg.AutoGenerateColumns = true;
             dg.ItemsSource = table.DefaultView;
             set_headers(dg);
+            current_file.table_data = table;
         }
     }
 }

@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:Autoaccept_electrical_app"
         mc:Ignorable="d"
         Title="MainWindow" Height="600" Width="1100"
-        FontFamily="Segoe UI">
+        FontFamily="Segoe UI" Background="#f7f7f9">
+        
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
 
@@ -100,9 +101,12 @@
         </StackPanel>
 
         <StackPanel RenderTransformOrigin="0.495,0.379" Margin="125,10,0,317">
-                <Button Background="#FF135FD6" Height="38" Width="161" HorizontalAlignment="Right" Margin="0,4,10,0" Click="GenerateDocButton_Click">
+            <Button Background="#FF135FD6" Height="40" Width="160" HorizontalAlignment="Right" Margin="0,4,10,0" Click="GenerateDocButton_Click">
                 <TextBlock Text="Сгенерировать документ" Foreground="White" FontWeight="Bold" Margin="0, -2, 0, 0"/>
-            </Button>
+                </Button>
+                <Button Background="#fefefe" Height="40" Width="108" HorizontalAlignment="Right" Margin="0, -40,180,0" Name="SaveButton" Click="SaveButton_Click">
+                    <TextBlock Text="Сохранить" Foreground="Gray" FontWeight="Bold" Margin="0, -2, 0, 0"/>
+            </Button>   
         </StackPanel>
 
         <Border Margin="120,0,0,0" Width="280" HorizontalAlignment="Left"
@@ -212,11 +216,11 @@
 
                         </StackPanel>
                     </StackPanel>
-                    <StackPanel Margin="0,0,0,0" Width="410" Height="520">
+                    <StackPanel Margin="0,0,0,0" Width="397" Height="502">
                         <Border Height="54" Width="400" BorderBrush="DarkGray" BorderThickness="1, 0, 1, 1" CornerRadius="2" VerticalAlignment="Top" >
                             <Label Content="Предпросмотр"/>
                         </Border>
-                        <DataGrid Height="466" Width="400" Name="DocDataGrid" MinRowHeight="25" />
+                        <DataGrid Height="444" Width="400" Name="DocDataGrid" MinRowHeight="25" />
                     </StackPanel>
                 </StackPanel>
         </Border>

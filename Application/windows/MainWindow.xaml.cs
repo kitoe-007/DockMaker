@@ -103,8 +103,6 @@ namespace Autoaccept_electrical_app
             int cut_top = 0;
             int cut_bottom = 0;
 
-            // TextBox может быть пустым (например, cut_bottom), поэтому только int.TryParse
-            // чтобы не ловить исключение при int.Parse("").
             if (!int.TryParse(Numeric_up_down_cut_top.Text, out cut_top))
                 cut_top = 0;
             if (!int.TryParse(Numeric_up_down_cut_bottom.Text, out cut_bottom))
@@ -146,7 +144,8 @@ namespace Autoaccept_electrical_app
             OJR_template ojr_tem = new OJR_template();
             try
             {
-                ojr_tem.create_table(DocDataGrid, _current_file.json_data, cut_top, cut_bottom);
+                ojr_tem.create_table(DocDataGrid, _current_file.json_data, cut_top, cut_bottom, _current_file);
+                
             }
             catch (System.Exception ex)
             {
@@ -172,6 +171,10 @@ namespace Autoaccept_electrical_app
             DataSourceFileComboBox.SelectedValue = filePath;
         }
 
+        private void Numeric_change(TextBox numeric, int delta)
+        {
+            numeric.Text = Numeric_up_down_cut_top.Text.All(char.IsDigit) ? (int.Parse(numeric.Text) + delta).ToString() : "0";
+        }
         private void Numeric_top_up_button_Click(object sender, RoutedEventArgs e)
         {
             bool isOnlyDigits = Numeric_up_down_cut_top.Text.All(char.IsDigit);
@@ -226,6 +229,12 @@ namespace Autoaccept_electrical_app
             {
                 Numeric_up_down_cut_bottom.Text = "0";
             }
+        }
+
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            int a = 0; // Создать c# скрипт для преобразования data_table в json а после перенести его в docx_builder
+            //_current_file.table_data;
         }
     }
 }
