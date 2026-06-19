@@ -48,6 +48,6 @@ if __name__ == "__main__":
     builder = DOCX_table_builder()
     input_file = sys.argv[1]
     output_file = sys.argv[2]
-    with open(input_file, 'r', encoding='utf-8') as file:
+    with open(input_file, 'r', encoding='utf-8-sig') as file:
         data = json.load(file)
     builder.build(data, output_file)

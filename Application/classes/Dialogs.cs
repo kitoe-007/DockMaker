@@ -22,5 +22,18 @@ namespace Autoaccept_electrical_app.classes
             }
             return false;
         }
+
+        public bool SaveFileDialog()
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "Word documents (*.docx)|*.docx|All files (*.*)|*.*";
+            saveFileDialog.DefaultExt = "docx";
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                FilePath = saveFileDialog.FileName;
+                return true;
+            }
+            return false;
+        }
     }
 }

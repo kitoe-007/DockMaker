@@ -1,9 +1,11 @@
 ﻿using Autoaccept_electrical_app.auxiliary_modules;
 using Autoaccept_electrical_app.classes;
 using Autoaccept_electrical_app.templates;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -233,8 +235,38 @@ namespace Autoaccept_electrical_app
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            int a = 0; // Создать c# скрипт для преобразования data_table в json а после перенести его в docx_builder
-            //_current_file.table_data;
+            if (_current_file.table_data == null || _current_file.table_data.Rows.Count == 0)
+            {
+                MessageBox.Show("Нет данных для сохранения. Сначала сгенерируйте документ.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            Dialogs dialog_manager = new Dialogs();
+            if (!dialog_manager.SaveFileDialog())
+                return;
+
+            string pythonExe = @"C:\Users\user\Desktop\работа\Приложения\Паша\git\autoaccept-electrical\File_extractors\.venv\Scripts\python.exe";
+            string Docx_builder = @"C:\Users\user\Desktop\работа\Приложения\Паша\git\autoaccept-electrical\File_builder\DOCX_table_builder.py";
+            string outputDocx = dialog_manager.FilePath;
+
+            string jsonPath = Path.Combine(Path.GetTempPath(), $"aae_table_{Guid.NewGuid():N}.json");
+            try
+            {
+                var converter = new DataTable_to_json();
+                File.WriteAllText(jsonPath, converter.ConvertDataTableToJson(_current_file.table_data), new System.Text.UTF8Encoding(false));
+
+                var launcher = new launch_and_data_extraction();
+                string result = launcher.launch_script(pythonExe, Docx_builder, jsonPath, outputDocx);
+                if (result == "Ошибки")
+                    return;
+
+                MessageBox.Show($"Документ сохранён:\n{outputDocx}", "Успешно", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            finally
+            {
+                if (File.Exists(jsonPath))
+                    File.Delete(jsonPath);
+            }
         }
     }
 }
