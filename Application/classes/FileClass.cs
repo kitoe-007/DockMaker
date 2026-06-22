@@ -11,5 +11,7 @@ namespace Autoaccept_electrical_app.classes
     {
         public List<List<string>> json_data { get; set;  }
         public DataTable table_data { get; set; }
+        // Шаблон, по которому была сгенерирована table_data: "OJR" или "ZHV"
+        public string template_key { get; set; }
     }
 }

@@ -205,7 +205,7 @@
                 </StackPanel>
 
                 <!-- Параметры и предпросмотр -->
-                <Grid Grid.Row="1" Name="OjrWorkspacePanel" Visibility="Collapsed" Margin="0,0,10,10">
+                <Grid Grid.Row="1" Name="TemplateWorkspacePanel" Visibility="Collapsed" Margin="0,0,10,10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="280" MinWidth="240"/>
                         <ColumnDefinition Width="8"/>
@@ -275,8 +275,36 @@
                                     <Label Content="Раздел" Padding="0,4,0,4"/>
                                     <TextBox Height="24" Margin="0,0,0,8" Name="SectionTextBox"/>
 
-                                    <Label Content="Должность, ФИО" Padding="0,4,0,4"/>
-                                    <TextBox Height="24" Name="PositionFioTextBox"/>
+                                    <StackPanel Name="OjrOnlyFields">
+                                        <Label Content="Должность, ФИО" Padding="0,4,0,4"/>
+                                        <TextBox Height="24" Name="PositionFioTextBox"/>
+                                    </StackPanel>
+
+                                    <StackPanel Name="ZhvOnlyFields" Visibility="Collapsed">
+                                        <Label Content="Наименование объекта" Padding="0,4,0,4"/>
+                                        <TextBox Height="24" Margin="0,0,0,8" Name="ObjectNameTextBox" TextWrapping="Wrap"/>
+
+                                        <Label Content="Адрес объекта" Padding="0,4,0,4"/>
+                                        <TextBox Height="24" Margin="0,0,0,8" Name="ObjectAddressTextBox" TextWrapping="Wrap"/>
+
+                                        <Label Content="Строительная организация" Padding="0,4,0,4"/>
+                                        <TextBox Height="24" Margin="0,0,0,8" Name="OrganizationTextBox"/>
+
+                                        <Label Content="Начат" Padding="0,4,0,4"/>
+                                        <TextBox Height="24" Margin="0,0,0,8" Name="StartedDateTextBox"/>
+
+                                        <Label Content="Окончен" Padding="0,4,0,4"/>
+                                        <TextBox Height="24" Margin="0,0,0,8" Name="FinishedDateTextBox"/>
+
+                                        <Label Content="Вид контроля" Padding="0,4,0,4"/>
+                                        <TextBox Height="24" Margin="0,0,0,8" Name="ControlTypeTextBox" Text="Визуальный"/>
+
+                                        <Label Content="Результат контроля" Padding="0,4,0,4"/>
+                                        <TextBox Height="24" Margin="0,0,0,8" Name="ControlResultTextBox" Text="Пригоден"/>
+
+                                        <Label Content="Подпись (ФИО)" Padding="0,4,0,4"/>
+                                        <TextBox Height="24" Name="InspectorFioTextBox"/>
+                                    </StackPanel>
                                 </StackPanel>
                             </ScrollViewer>
                         </Grid>
@@ -297,24 +325,65 @@
                             </Border>
 
                             <StackPanel Grid.Row="1" Margin="16,16,16,12">
-                                <TextBlock Text="РАЗДЕЛ 3"
-                                           FontFamily="Times New Roman"
-                                           FontSize="14"
-                                           FontWeight="Bold"
-                                           TextAlignment="Center"
-                                           HorizontalAlignment="Center"/>
-                                <TextBlock Text="Сведения о выполнении работ в процессе строительства, реконструкции, капитального ремонта объекта"
-                                           FontFamily="Times New Roman"
-                                           FontSize="14"
-                                           TextAlignment="Center"
-                                           TextWrapping="Wrap"
-                                           HorizontalAlignment="Center"
-                                           Margin="0,4,0,0"/>
-                                <TextBlock Text="капитального строительства"
-                                           FontFamily="Times New Roman"
-                                           FontSize="14"
-                                           TextAlignment="Center"
-                                           HorizontalAlignment="Center"/>
+                                <StackPanel Name="OjrPreviewHeader">
+                                    <TextBlock Text="РАЗДЕЛ 3"
+                                               FontFamily="Times New Roman"
+                                               FontSize="14"
+                                               FontWeight="Bold"
+                                               TextAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Сведения о выполнении работ в процессе строительства, реконструкции, капитального ремонта объекта"
+                                               FontFamily="Times New Roman"
+                                               FontSize="14"
+                                               TextAlignment="Center"
+                                               TextWrapping="Wrap"
+                                               HorizontalAlignment="Center"
+                                               Margin="0,4,0,0"/>
+                                    <TextBlock Text="капитального строительства"
+                                               FontFamily="Times New Roman"
+                                               FontSize="14"
+                                               TextAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                                </StackPanel>
+
+                                <StackPanel Name="ZhvPreviewHeader" Visibility="Collapsed">
+                                    <TextBlock Text="Журнал"
+                                               FontFamily="Times New Roman"
+                                               FontSize="14"
+                                               FontWeight="Bold"
+                                               TextAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                                    <TextBlock Text="входного учета и контроля качества получаемых деталей, материалов, конструкций и оборудования"
+                                               FontFamily="Times New Roman"
+                                               FontSize="14"
+                                               TextAlignment="Center"
+                                               TextWrapping="Wrap"
+                                               HorizontalAlignment="Center"
+                                               Margin="0,4,0,0"/>
+                                    <TextBlock Name="ZhvPreviewObjectName"
+                                               FontFamily="Times New Roman"
+                                               FontSize="14"
+                                               TextWrapping="Wrap"
+                                               Margin="0,8,0,0"/>
+                                    <TextBlock Name="ZhvPreviewObjectAddress"
+                                               FontFamily="Times New Roman"
+                                               FontSize="14"
+                                               TextWrapping="Wrap"
+                                               Margin="0,4,0,0"/>
+                                    <TextBlock Name="ZhvPreviewOrganization"
+                                               FontFamily="Times New Roman"
+                                               FontSize="14"
+                                               TextWrapping="Wrap"
+                                               Margin="0,4,0,0"/>
+                                    <TextBlock Name="ZhvPreviewStartedDate"
+                                               FontFamily="Times New Roman"
+                                               FontSize="14"
+                                               Margin="0,8,0,0"/>
+                                    <TextBlock Name="ZhvPreviewFinishedDate"
+                                               FontFamily="Times New Roman"
+                                               FontSize="14"
+                                               Margin="0,4,0,0"/>
+                                </StackPanel>
                             </StackPanel>
 
                             <DataGrid Grid.Row="2" Name="DocDataGrid" MinRowHeight="25"

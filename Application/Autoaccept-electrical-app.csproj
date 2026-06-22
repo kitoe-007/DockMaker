@@ -95,6 +95,7 @@
     <Compile Include="classes\FileClass.cs" />
     <Compile Include="classes\Json_to_array_convertor.cs" />
     <Compile Include="templates\OJR_template.cs" />
+    <Compile Include="templates\ZHV_template.cs" />
     <Compile Include="windows\App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>

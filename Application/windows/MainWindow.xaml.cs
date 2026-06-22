@@ -19,6 +19,9 @@ namespace Autoaccept_electrical_app
     public ObservableCollection<DataSourceFileItem> DataSourceFiles { get; set; }
 
     private FileClass _current_file = new FileClass();
+    // Ключ выбранного шаблона: "OJR" или "ZHV"; null — шаблон не выбран
+    private string _currentTemplateKey;
+
     public MainWindow()
     {
       InitializeComponent();
@@ -48,12 +51,43 @@ namespace Autoaccept_electrical_app
     {
       var node = e.NewValue as TreeNode;
       bool isSelectedTemp = node != null && !node.IsFolder;
-      var visibility = isSelectedTemp && node.TemplateKey == "OJR" ? Visibility.Visible : Visibility.Collapsed;
+      bool isOjr = isSelectedTemp && node.TemplateKey == "OJR";
+      bool isZhv = isSelectedTemp && node.TemplateKey == "ZHV";
 
-      OjrWorkspacePanel.Visibility = visibility;
+      // Одна рабочая панель: общие поля (Excel, обрезка, раздел) + блоки OjrOnlyFields / ZhvOnlyFields
+      TemplateWorkspacePanel.Visibility = isOjr || isZhv ? Visibility.Visible : Visibility.Collapsed;
+      OjrOnlyFields.Visibility = isOjr ? Visibility.Visible : Visibility.Collapsed;
+      ZhvOnlyFields.Visibility = isZhv ? Visibility.Visible : Visibility.Collapsed;
+      OjrPreviewHeader.Visibility = isOjr ? Visibility.Visible : Visibility.Collapsed;
+      ZhvPreviewHeader.Visibility = isZhv ? Visibility.Visible : Visibility.Collapsed;
 
-      if (!(isSelectedTemp && node.TemplateKey == "OJR"))
+      string newTemplateKey = isSelectedTemp ? node.TemplateKey : null;
+      if (newTemplateKey != _currentTemplateKey)
+      {
+        // Сброс предпросмотра при смене шаблона, чтобы не показывать чужую таблицу
         DocDataGrid.ItemsSource = null;
+        _current_file.table_data = null;
+      }
+
+      _currentTemplateKey = newTemplateKey;
+
+      if (isZhv)
+        UpdateZhvPreviewHeader();
+    }
+
+    // Текст шапки ЖВК в предпросмотре синхронизируется с полями параметров
+    private void UpdateZhvPreviewHeader()
+    {
+      ZhvPreviewObjectName.Text = FormatLabeledField("Наименование объекта", ObjectNameTextBox.Text);
+      ZhvPreviewObjectAddress.Text = FormatLabeledField("Адрес объекта", ObjectAddressTextBox.Text);
+      ZhvPreviewOrganization.Text = FormatLabeledField("Наименование строительной организации", OrganizationTextBox.Text);
+      ZhvPreviewStartedDate.Text = FormatLabeledField("Начат", StartedDateTextBox.Text);
+      ZhvPreviewFinishedDate.Text = FormatLabeledField("Окончен", FinishedDateTextBox.Text);
+    }
+
+    private static string FormatLabeledField(string label, string value)
+    {
+      return string.IsNullOrWhiteSpace(value) ? "" : $"{label}  {value.Trim()}";
     }
 
     private void TreeViewItem_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -69,6 +103,12 @@ namespace Autoaccept_electrical_app
 
         private void GenerateDocButton_Click(object sender, RoutedEventArgs e)
         {
+            if (string.IsNullOrEmpty(_currentTemplateKey))
+            {
+                MessageBox.Show("Выберите шаблон документа.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             DocDataGrid.ItemsSource = null;
             Json_to_array_convertor js_con = new Json_to_array_convertor();
             launch_and_data_extraction launch_script = new launch_and_data_extraction();
@@ -114,12 +154,36 @@ namespace Autoaccept_electrical_app
                 return;
             }
 
-            OJR_template ojr_tem = new OJR_template();
+            _current_file.template_key = _currentTemplateKey;
+            string sectionFilter = SectionTextBox.Text?.Trim() ?? "";
+
             try
             {
-                string sectionFilter = SectionTextBox.Text?.Trim() ?? "";
-                string positionFio = PositionFioTextBox.Text?.Trim() ?? "";
-                ojr_tem.create_table(DocDataGrid, _current_file.json_data, cut_top, cut_bottom, _current_file, sectionFilter, positionFio);
+                if (_currentTemplateKey == "OJR")
+                {
+                    string positionFio = PositionFioTextBox.Text?.Trim() ?? "";
+                    var ojr_tem = new OJR_template();
+                    ojr_tem.create_table(DocDataGrid, _current_file.json_data, cut_top, cut_bottom, _current_file, sectionFilter, positionFio);
+                }
+                else if (_currentTemplateKey == "ZHV")
+                {
+                    UpdateZhvPreviewHeader();
+                    var zhv_tem = new ZHV_template();
+                    zhv_tem.create_table(
+                        DocDataGrid,
+                        _current_file.json_data,
+                        cut_top,
+                        cut_bottom,
+                        _current_file,
+                        sectionFilter,
+                        ControlTypeTextBox.Text,
+                        ControlResultTextBox.Text,
+                        InspectorFioTextBox.Text);
+                }
+                else
+                {
+                    MessageBox.Show("Выбран неподдерживаемый шаблон.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
             }
             catch (System.Exception ex)
             {
@@ -205,6 +269,26 @@ namespace Autoaccept_electrical_app
             }
         }
 
+        // Метаданные с префиксом «_» попадают в JSON и читаются DOCX_table_builder.py (не в таблицу)
+        private Dictionary<string, string> BuildSaveMetadata()
+        {
+            var metadata = new Dictionary<string, string>
+            {
+                ["_template"] = _current_file.template_key ?? "OJR"
+            };
+
+            if (_current_file.template_key == "ZHV")
+            {
+                metadata["_object_name"] = ObjectNameTextBox.Text?.Trim() ?? "";
+                metadata["_object_address"] = ObjectAddressTextBox.Text?.Trim() ?? "";
+                metadata["_organization"] = OrganizationTextBox.Text?.Trim() ?? "";
+                metadata["_started_date"] = StartedDateTextBox.Text?.Trim() ?? "";
+                metadata["_finished_date"] = FinishedDateTextBox.Text?.Trim() ?? "";
+            }
+
+            return metadata;
+        }
+
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             if (_current_file.table_data == null || _current_file.table_data.Rows.Count == 0)
@@ -225,7 +309,10 @@ namespace Autoaccept_electrical_app
             try
             {
                 var converter = new DataTable_to_json();
-                File.WriteAllText(jsonPath, converter.ConvertDataTableToJson(_current_file.table_data, DocDataGrid), new System.Text.UTF8Encoding(false));
+                File.WriteAllText(
+                    jsonPath,
+                    converter.ConvertDataTableToJson(_current_file.table_data, DocDataGrid, BuildSaveMetadata()),
+                    new System.Text.UTF8Encoding(false));
 
                 var launcher = new launch_and_data_extraction();
                 string result = launcher.launch_script(pythonExe, Docx_builder, jsonPath, outputDocx);
