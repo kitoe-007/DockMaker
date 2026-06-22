@@ -31,58 +31,29 @@ namespace Autoaccept_electrical_app
     {
       return new ObservableCollection<TreeNode>
       {
-        new TreeNode
-        {
-          Name = "Договоры",
-          IsFolder = true,
-          IsExpanded = true,
-          Children = new ObservableCollection<TreeNode>
-          {
-            new TreeNode { Name = "Договор поставки", IsFolder = false },
-            new TreeNode { Name = "Договор подряда", IsFolder = false },
-            new TreeNode { Name = "Доп. соглашение", IsFolder = false },
-            new TreeNode { Name = "Спецификация", IsFolder = false }
-          }
-        },
-        new TreeNode
-        {
-          Name = "Приказы",
-          IsFolder = true,
-          Children = new ObservableCollection<TreeNode>
-          {
-            new TreeNode { Name = "Приказ о приёме", IsFolder = false },
-            new TreeNode { Name = "Приказ об увольнении", IsFolder = false }
-          }
-        },
-        new TreeNode
-        {
-          Name = "Акты",
-          IsFolder = true,
-          Children = new ObservableCollection<TreeNode>
-          {
-            new TreeNode { Name = "Акт выполненных работ", IsFolder = false },
-            new TreeNode { Name = "Акт приёма-передачи", IsFolder = false }
-          }
-        },
-        new TreeNode
-        {
-          Name = "Служебные записки",
-          IsFolder = true,
-          Children = new ObservableCollection<TreeNode>
-          {
-            new TreeNode { Name = "Служебная записка", IsFolder = false }
-          }
-        },
-        new TreeNode
-        {
-          Name = "Прочее",
-          IsFolder = true,
-          Children = new ObservableCollection<TreeNode>
-          {
-            new TreeNode { Name = "Шаблон без категории", IsFolder = false }
-          }
-        }
+        new TreeNode { Name = "ОЖР", IsFolder = false, TemplateKey = "OJR" },
+        new TreeNode { Name = "ЖВК", IsFolder = false, TemplateKey = "ZHV" }
       };
+    }
+
+    private static string ResolveProjectPath(params string[] relativeParts)
+    {
+      var parts = new[] { AppDomain.CurrentDomain.BaseDirectory, "..", "..", ".." }
+        .Concat(relativeParts)
+        .ToArray();
+      return Path.GetFullPath(Path.Combine(parts));
+    }
+
+    private void TemplatesTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+    {
+      var node = e.NewValue as TreeNode;
+      bool isSelectedTemp = node != null && !node.IsFolder;
+      var visibility = isSelectedTemp && node.TemplateKey == "OJR" ? Visibility.Visible : Visibility.Collapsed;
+
+      OjrWorkspacePanel.Visibility = visibility;
+
+      if (!(isSelectedTemp && node.TemplateKey == "OJR"))
+        DocDataGrid.ItemsSource = null;
     }
 
     private void TreeViewItem_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -112,8 +83,8 @@ namespace Autoaccept_electrical_app
 
             if (cut_top < 0) cut_top = 0;
             if (cut_bottom < 0) cut_bottom = 0;
-            string pythonExe = @"C:\Users\user\Desktop\работа\Приложения\Паша\git\autoaccept-electrical\File_extractors\.venv\Scripts\python.exe";
-            string extractorPy = @"C:\Users\user\Desktop\работа\Приложения\Паша\git\autoaccept-electrical\File_extractors\XLSX_extractor.py";
+            string pythonExe = ResolveProjectPath("File_extractors", ".venv", "Scripts", "python.exe");
+            string extractorPy = ResolveProjectPath("File_extractors", "XLSX_extractor.py");
             string xlsx = DataSourceFileComboBox.SelectedValue as string;
             if (xlsx == null) 
             {
@@ -246,8 +217,8 @@ namespace Autoaccept_electrical_app
             if (!dialog_manager.SaveFileDialog())
                 return;
 
-            string pythonExe = @"C:\Users\user\Desktop\работа\Приложения\Паша\git\autoaccept-electrical\File_extractors\.venv\Scripts\python.exe";
-            string Docx_builder = @"C:\Users\user\Desktop\работа\Приложения\Паша\git\autoaccept-electrical\File_builder\DOCX_table_builder.py";
+            string pythonExe = ResolveProjectPath("File_extractors", ".venv", "Scripts", "python.exe");
+            string Docx_builder = ResolveProjectPath("File_builder", "DOCX_table_builder.py");
             string outputDocx = dialog_manager.FilePath;
 
             string jsonPath = Path.Combine(Path.GetTempPath(), $"aae_table_{Guid.NewGuid():N}.json");

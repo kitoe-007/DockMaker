@@ -111,7 +111,6 @@ namespace Autoaccept_electrical_app.templates
                 string dateVal = GetCell(data, 0, i);
                 string sectionVal = GetCell(data, 2, i);
                 string nameVal = GetCell(data, 4, i);
-                string fioVal = GetCell(data, 8, i);
 
                 if (!string.IsNullOrEmpty(dateVal))
                 {
@@ -130,7 +129,7 @@ namespace Autoaccept_electrical_app.templates
                     currentRow[0] = ind.ToString();
                     currentRow[1] = dateVal;
                     currentRow[2] = "";
-                    currentRow[3] = usePositionFioFromField ? positionFio.Trim() : fioVal;
+                    currentRow[3] = usePositionFioFromField ? positionFio.Trim() : "";
                 }
                 else if (!string.IsNullOrEmpty(sectionVal))
                 {
@@ -146,7 +145,7 @@ namespace Autoaccept_electrical_app.templates
                     continue;
 
                 if (currentRow == null && !string.IsNullOrEmpty(currentDate) &&
-                    (!string.IsNullOrEmpty(nameVal) || (!usePositionFioFromField && !string.IsNullOrEmpty(fioVal))))
+                    !string.IsNullOrEmpty(nameVal))
                 {
                     ind++;
                     currentRow = table.NewRow();
@@ -161,9 +160,6 @@ namespace Autoaccept_electrical_app.templates
 
                 if (!string.IsNullOrEmpty(nameVal))
                     AppendColumnValue(currentRow, 2, nameVal);
-
-                if (!usePositionFioFromField && !string.IsNullOrEmpty(fioVal))
-                    AppendColumnValue(currentRow, 3, fioVal);
             }
 
             FlushRow(table, ref currentRow);

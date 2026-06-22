@@ -7,6 +7,7 @@ namespace Autoaccept_electrical_app
         public string Name { get; set; }
         public bool IsFolder { get; set; }
         public bool IsExpanded { get; set; }
+        public string TemplateKey { get; set; }
         public ObservableCollection<TreeNode> Children { get; set; }
 
         public TreeNode()

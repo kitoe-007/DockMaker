@@ -6,8 +6,9 @@
         xmlns:local="clr-namespace:Autoaccept_electrical_app"
         mc:Ignorable="d"
         Title="MainWindow" Height="600" Width="1100"
+        MinWidth="900" MinHeight="500"
         FontFamily="Segoe UI" Background="#f7f7f9">
-        
+
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
 
@@ -74,160 +75,257 @@
             </StackPanel>
         </HierarchicalDataTemplate>
     </Window.Resources>
-    <Border BorderBrush="DarkGray" BorderThickness="0, 1, 0, 0">
-    <Grid>
-        <StackPanel Width="120" HorizontalAlignment="Left" Background="#FF0C305D">
-            <Button HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalContentAlignment="Right" Margin="10,15,0,0" Width="100" Height="36" Background="#FF0F3B78"
-                    BorderBrush="White" BorderThickness="1">
-                <StackPanel Orientation="Horizontal">
-                    <Image Source="/static/images/document-icon.png" Width="20" Height="20" OpacityMask="White"/>
-                    <TextBlock Text="Документы" Margin="5,0,5,0" Foreground="White" FontWeight="Bold"/>
-                </StackPanel>
-            </Button>
-            <Button HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalContentAlignment="Right" Margin="10,15,0,0" Width="100" Height="36" Background="#FF0F3B78"
-                    BorderBrush="White" BorderThickness="1">
-                <StackPanel Orientation="Horizontal" Width="100">
-                    <Image Source="/static/images/data-icon.png" Width="24" Height="24"/>
-                    <TextBlock Text="Данные" Margin="5,5,0,0" Foreground="White" FontWeight="Bold" Width="100"/>
-                </StackPanel>
-            </Button>
-            <Button HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalContentAlignment="Right" Margin="10,15,0,0" Width="100" Height="36" Background="#FF0F3B78"
-                    BorderBrush="White" BorderThickness="1">
-                <StackPanel Orientation="Horizontal">
-                    <Image Source="/static/images/settings-icon.png" Width="24" Height="24"/>
-                    <TextBlock Text="Настройки" Margin="5,5,5,0" Foreground="White" FontWeight="Bold"/>
-                </StackPanel>
-            </Button>
-        </StackPanel>
 
-        <StackPanel RenderTransformOrigin="0.495,0.379" Margin="125,10,0,317">
-            <Button Background="#FF135FD6" Height="40" Width="160" HorizontalAlignment="Right" Margin="0,4,10,0" Click="GenerateDocButton_Click">
-                <TextBlock Text="Сгенерировать документ" Foreground="White" FontWeight="Bold" Margin="0, -2, 0, 0"/>
-                </Button>
-                <Button Background="#fefefe" Height="40" Width="108" HorizontalAlignment="Right" Margin="0, -40,180,0" Name="SaveButton" Click="SaveButton_Click">
-                    <TextBlock Text="Сохранить" Foreground="Gray" FontWeight="Bold" Margin="0, -2, 0, 0"/>
-            </Button>   
-        </StackPanel>
+    <Border BorderBrush="DarkGray" BorderThickness="0,1,0,0">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="120"/>
+                <ColumnDefinition Width="280"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-        <Border Margin="120,0,0,0" Width="280" HorizontalAlignment="Left"
-                BorderBrush="#DADCE0" BorderThickness="0,0,1,0" Background="White">
-            <Grid Margin="16,12,16,12">
+            <!-- Боковая навигация -->
+            <Border Grid.Column="0" Background="#FF0C305D">
+                <StackPanel Margin="10,15,10,0">
+                    <Button Height="36" Margin="0,0,0,15" Background="#FF0F3B78"
+                            BorderBrush="White" BorderThickness="1" HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Center">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/static/images/document-icon.png" Width="20" Height="20" OpacityMask="White"/>
+                            <TextBlock Text="Документы" Margin="5,0,0,0" Foreground="White" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Height="36" Margin="0,0,0,15" Background="#FF0F3B78"
+                            BorderBrush="White" BorderThickness="1" HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Center">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/static/images/data-icon.png" Width="24" Height="24"/>
+                            <TextBlock Text="Данные" Margin="5,0,0,0" Foreground="White" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Height="36" Background="#FF0F3B78"
+                            BorderBrush="White" BorderThickness="1" HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Center">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/static/images/settings-icon.png" Width="24" Height="24"/>
+                            <TextBlock Text="Настройки" Margin="5,0,0,0" Foreground="White" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Border>
+
+            <!-- Панель шаблонов -->
+            <Border Grid.Column="1"
+                    BorderBrush="#DADCE0" BorderThickness="0,0,1,0" Background="White">
+                <Grid Margin="16,12,16,12">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="Шаблоны" FontWeight="Bold" FontSize="22" Margin="0,0,0,12"/>
+
+                    <Button Grid.Row="1" Background="#FF135FD6" Height="38" HorizontalAlignment="Stretch" Margin="0,0,0,12" BorderThickness="0" Cursor="Hand">
+                        <TextBlock Text="+ Создать шаблон" Foreground="White" FontWeight="SemiBold" FontSize="13"/>
+                    </Button>
+
+                    <Border Grid.Row="2" BorderBrush="#DADCE0" BorderThickness="1" CornerRadius="4" Margin="0,0,0,12" Background="#F8F9FA">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="&#xE721;" FontFamily="Segoe MDL2 Assets"
+                                       Foreground="#9AA0A6" Margin="10,0,6,0" VerticalAlignment="Center"/>
+                            <TextBox Grid.Column="1" BorderThickness="0" Background="Transparent"
+                                     VerticalAlignment="Center" Padding="0,8"
+                                     Foreground="#5F6368" FontSize="13">
+                                <TextBox.Style>
+                                    <Style TargetType="TextBox">
+                                        <Style.Triggers>
+                                            <Trigger Property="Text" Value="">
+                                                <Setter Property="Background">
+                                                    <Setter.Value>
+                                                        <VisualBrush AlignmentX="Left" AlignmentY="Center" Stretch="None">
+                                                            <VisualBrush.Visual>
+                                                                <TextBlock Text="Поиск шаблонов" Foreground="#9AA0A6" FontSize="13" Margin="0,0,8,0"/>
+                                                            </VisualBrush.Visual>
+                                                        </VisualBrush>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBox.Style>
+                            </TextBox>
+                        </Grid>
+                    </Border>
+
+                    <TreeView Grid.Row="3"
+                              Name="TemplatesTreeView"
+                              ItemsSource="{Binding Folders}"
+                              BorderThickness="0"
+                              Background="Transparent"
+                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                              ItemContainerStyle="{StaticResource TemplateTreeViewItem}"
+                              SelectedItemChanged="TemplatesTreeView_SelectedItemChanged"/>
+
+                    <Button Grid.Row="4" Height="36" Margin="0,12,0,0" HorizontalAlignment="Stretch"
+                            Background="Transparent" BorderBrush="#DADCE0" BorderThickness="1" Cursor="Hand">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <TextBlock Text="&#xE898;" FontFamily="Segoe MDL2 Assets" Foreground="#5F6368" Margin="0,0,8,0"/>
+                            <TextBlock Text="Импортировать шаблон" Foreground="#5F6368" FontSize="13"/>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- Основная рабочая область -->
+            <Grid Grid.Column="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0" Text="Шаблоны" FontWeight="Bold" FontSize="22" Margin="0,0,0,12"/>
-
-                <Button Grid.Row="1" Background="#FF135FD6" Height="38" HorizontalAlignment="Stretch" Margin="0,0,0,12" BorderThickness="0" Cursor="Hand">
-                    <TextBlock Text="+ Создать шаблон" Foreground="White" FontWeight="SemiBold" FontSize="13"/>
-                </Button>
-
-                <Border Grid.Row="2" BorderBrush="#DADCE0" BorderThickness="1" CornerRadius="4" Margin="0,0,0,12" Background="#F8F9FA">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="&#xE721;" FontFamily="Segoe MDL2 Assets"
-                                   Foreground="#9AA0A6" Margin="10,0,6,0" VerticalAlignment="Center"/>
-                        <TextBox Grid.Column="1" BorderThickness="0" Background="Transparent"
-                                 VerticalAlignment="Center" Padding="0,8"
-                                 Foreground="#5F6368" FontSize="13">
-                            <TextBox.Style>
-                                <Style TargetType="TextBox">
-                                    <Style.Triggers>
-                                        <Trigger Property="Text" Value="">
-                                            <Setter Property="Background">
-                                                <Setter.Value>
-                                                    <VisualBrush AlignmentX="Left" AlignmentY="Center" Stretch="None">
-                                                        <VisualBrush.Visual>
-                                                            <TextBlock Text="Поиск шаблонов" Foreground="#9AA0A6" FontSize="13" Margin="0,0,8,0"/>
-                                                        </VisualBrush.Visual>
-                                                    </VisualBrush>
-                                                </Setter.Value>
-                                            </Setter>
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBox.Style>
-                        </TextBox>
-                    </Grid>
-                </Border>
-
-                <TreeView Grid.Row="3"
-                          ItemsSource="{Binding Folders}"
-                          BorderThickness="0"
-                          Background="Transparent"
-                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                          ItemContainerStyle="{StaticResource TemplateTreeViewItem}"/>
-
-                <Button Grid.Row="4" Height="36" Margin="0,12,0,0" HorizontalAlignment="Stretch"
-                        Background="Transparent" BorderBrush="#DADCE0" BorderThickness="1" Cursor="Hand">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="&#xE898;" FontFamily="Segoe MDL2 Assets" Foreground="#5F6368" Margin="0,0,8,0"/>
-                        <TextBlock Text="Импортировать шаблон" Foreground="#5F6368" FontSize="13"/>
-                    </StackPanel>
-                </Button>
-            </Grid>
-        </Border>
-        <Border Margin="405,67,0,0" BorderBrush="DarkGray" BorderThickness="1">
-            <StackPanel Orientation="Horizontal">
-                    <StackPanel Height="520" Width="289" HorizontalAlignment="Left">
-                        <Border Height="54" Width="280" BorderBrush="DarkGray" BorderThickness="1, 0, 1, 1" CornerRadius="2" >
-                            <Label Content="Параметры" Margin="0,0,108,0"/>
-                        </Border>
-                        <StackPanel Height="457" Width="280">
-                            <UIElement.RenderTransform>
-                                <TransformGroup>
-                                    <ScaleTransform/>
-                                    <SkewTransform/>
-                                    <RotateTransform/>
-                                    <TranslateTransform/>
-                                </TransformGroup>
-                            </UIElement.RenderTransform>
-                            <Label Content="Источник данных" Height="28"/>
-                            <StackPanel Orientation="Horizontal" Height="32" >
-                                <ComboBox Height="24" Width="184" Margin="4, 0, 0, 0" Name="DataSourceFileComboBox"
-                                          ItemsSource="{Binding DataSourceFiles}"
-                                          DisplayMemberPath="FileName"
-                                          SelectedValuePath="FullPath"/>
-                                <Button Width="24" Height="24" Margin="4" Click="ChooseFileSourceButton_Click">
-                                    
-                                </Button>
-                            </StackPanel>
-                            <Label Content="Форматирование данных" Height="28"/>
-                            <StackPanel Orientation="Horizontal" Height="32" >
-                                <TextBox Width="80" Height="24" Name="Numeric_up_down_cut_top" Margin="4, 0, 0, 0" Text="0"></TextBox>
-
-                                <Button Width="24" Height="24" Margin="4" Content="↑" Name="Numeric_top_up_button" Click="Numeric_top_up_button_Click"/>
-                                <Button Width="24" Height="24" Margin="4" Content="↓" Name="Numeric_top_down_button" Click="Numeric_top_down_button_Click"/>
-                                <Label Margin="4" Content="Обрезать сверху" Height="28"></Label>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" Height="32" >
-                                <TextBox Width="80" Height="24" Margin="4, 0, 0, 0" Text="0" Name="Numeric_up_down_cut_bottom"></TextBox>
-                                <Button Width="24" Height="24" Margin="4" Content="↑" Name="Numeric_bottom_up_button" Click="Numeric_bottom_up_button_Click"/>
-                                <Button Width="24" Height="24" Margin="4" Content="↓" Name="Numeric_bottom_down_button" Click="Numeric_bottom_down_button_Click"/>
-                                <Label Margin="4" Content="Оббрезать снизу" Height="26"></Label>
-                            </StackPanel>
-                            <Label Content="Раздел" Height="28"/>
-                            <TextBox Height="24" Width="248" Margin="-20, 0, 0, 0" Name="SectionTextBox"/>
-                            <Label Content="Должность, ФИО" Height="28"/>
-                            <TextBox Height="24" Width="248" Margin="-20, 0, 0, 4" Name="PositionFioTextBox"/>
-
-                        </StackPanel>
-                    </StackPanel>
-                    <StackPanel Margin="0,0,0,0" Width="397" Height="502">
-                        <Border Height="54" Width="400" BorderBrush="DarkGray" BorderThickness="1, 0, 1, 1" CornerRadius="2" VerticalAlignment="Top" >
-                            <Label Content="Предпросмотр"/>
-                        </Border>
-                        <DataGrid Height="444" Width="400" Name="DocDataGrid" MinRowHeight="25" />
-                    </StackPanel>
+                <!-- Панель действий -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right"
+                            Margin="10,10,10,8">
+                    <Button Name="SaveButton" Click="SaveButton_Click"
+                            Background="#fefefe" Height="40" MinWidth="108" Margin="0,0,8,0"
+                            BorderBrush="#DADCE0" BorderThickness="1">
+                        <TextBlock Text="Сохранить" Foreground="Gray" FontWeight="Bold"/>
+                    </Button>
+                    <Button Background="#FF135FD6" Height="40" MinWidth="160"
+                            Click="GenerateDocButton_Click" BorderThickness="0">
+                        <TextBlock Text="Сгенерировать документ" Foreground="White" FontWeight="Bold"/>
+                    </Button>
                 </StackPanel>
-        </Border>
-    </Grid>
+
+                <!-- Параметры и предпросмотр -->
+                <Grid Grid.Row="1" Name="OjrWorkspacePanel" Visibility="Collapsed" Margin="0,0,10,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="280" MinWidth="240"/>
+                        <ColumnDefinition Width="8"/>
+                        <ColumnDefinition Width="*" MinWidth="300"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Параметры -->
+                    <Border Grid.Column="0" BorderBrush="DarkGray" BorderThickness="1">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <Border Grid.Row="0" BorderBrush="DarkGray" BorderThickness="0,0,0,1"
+                                    Background="#FAFAFA" Padding="12,0">
+                                <Label Content="Параметры" FontWeight="SemiBold" Padding="0,12"/>
+                            </Border>
+
+                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                <StackPanel Margin="12,8,12,12">
+                                    <Label Content="Источник данных" Padding="0,4,0,4"/>
+                                    <Grid Margin="0,0,0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <ComboBox Grid.Column="0" Height="24" Margin="0,0,8,0"
+                                                  Name="DataSourceFileComboBox"
+                                                  ItemsSource="{Binding DataSourceFiles}"
+                                                  DisplayMemberPath="FileName"
+                                                  SelectedValuePath="FullPath"/>
+                                        <Button Grid.Column="1" Width="24" Height="24"
+                                                Click="ChooseFileSourceButton_Click"/>
+                                    </Grid>
+
+                                    <Label Content="Форматирование данных" Padding="0,4,0,4"/>
+                                    <Grid Margin="0,0,0,4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="60"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBox Grid.Column="0" Height="24" Name="Numeric_up_down_cut_top" Text="0"/>
+                                        <Button Grid.Column="1" Width="24" Height="24" Margin="4,0,0,0"
+                                                Content="↑" Name="Numeric_top_up_button" Click="Numeric_top_up_button_Click"/>
+                                        <Button Grid.Column="2" Width="24" Height="24" Margin="4,0,0,0"
+                                                Content="↓" Name="Numeric_top_down_button" Click="Numeric_top_down_button_Click"/>
+                                        <Label Grid.Column="3" Content="Обрезать сверху" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                                    </Grid>
+                                    <Grid Margin="0,0,0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="60"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBox Grid.Column="0" Height="24" Name="Numeric_up_down_cut_bottom" Text="0"/>
+                                        <Button Grid.Column="1" Width="24" Height="24" Margin="4,0,0,0"
+                                                Content="↑" Name="Numeric_bottom_up_button" Click="Numeric_bottom_up_button_Click"/>
+                                        <Button Grid.Column="2" Width="24" Height="24" Margin="4,0,0,0"
+                                                Content="↓" Name="Numeric_bottom_down_button" Click="Numeric_bottom_down_button_Click"/>
+                                        <Label Grid.Column="3" Content="Обрезать снизу" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                                    </Grid>
+
+                                    <Label Content="Раздел" Padding="0,4,0,4"/>
+                                    <TextBox Height="24" Margin="0,0,0,8" Name="SectionTextBox"/>
+
+                                    <Label Content="Должность, ФИО" Padding="0,4,0,4"/>
+                                    <TextBox Height="24" Name="PositionFioTextBox"/>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </Grid>
+                    </Border>
+
+                    <!-- Предпросмотр -->
+                    <Border Grid.Column="2" BorderBrush="DarkGray" BorderThickness="1">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <Border Grid.Row="0" BorderBrush="DarkGray" BorderThickness="0,0,0,1"
+                                    Background="#FAFAFA" Padding="12,0">
+                                <Label Content="Предпросмотр" FontWeight="SemiBold" Padding="0,12"/>
+                            </Border>
+
+                            <StackPanel Grid.Row="1" Margin="16,16,16,12">
+                                <TextBlock Text="РАЗДЕЛ 3"
+                                           FontFamily="Times New Roman"
+                                           FontSize="14"
+                                           FontWeight="Bold"
+                                           TextAlignment="Center"
+                                           HorizontalAlignment="Center"/>
+                                <TextBlock Text="Сведения о выполнении работ в процессе строительства, реконструкции, капитального ремонта объекта"
+                                           FontFamily="Times New Roman"
+                                           FontSize="14"
+                                           TextAlignment="Center"
+                                           TextWrapping="Wrap"
+                                           HorizontalAlignment="Center"
+                                           Margin="0,4,0,0"/>
+                                <TextBlock Text="капитального строительства"
+                                           FontFamily="Times New Roman"
+                                           FontSize="14"
+                                           TextAlignment="Center"
+                                           HorizontalAlignment="Center"/>
+                            </StackPanel>
+
+                            <DataGrid Grid.Row="2" Name="DocDataGrid" MinRowHeight="25"
+                                      AutoGenerateColumns="True"
+                                      CanUserAddRows="False"
+                                      GridLinesVisibility="All"
+                                      HeadersVisibility="Column"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Grid>
     </Border>
 </Window>

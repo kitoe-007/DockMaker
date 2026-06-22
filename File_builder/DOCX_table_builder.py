@@ -3,8 +3,15 @@ import json
 import io
 
 from docx import Document
+from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+
+OJR_HEADER_LINES = [
+    ("РАЗДЕЛ 3", True),
+    ("Сведения о выполнении работ в процессе строительства, реконструкции, капитального ремонта объекта", False),
+    ("капитального строительства", False),
+]
 
 
 class DOCX_table_builder:
@@ -14,8 +21,15 @@ class DOCX_table_builder:
     def format_data_cell(self, cell, text):
         cell.text = "" if text is None else str(text)
 
+    def add_ojr_header(self, document):
+        for text, is_bold in OJR_HEADER_LINES:
+            paragraph = document.add_paragraph()
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            run = paragraph.add_run(text)
+            run.bold = is_bold
+
     def build(self, data, filename):
-        headers = list(data.keys())
+        headers = [key for key in data.keys() if not key.startswith("_")]
         columns = [data[header] for header in headers]
 
         if not columns:
@@ -25,6 +39,7 @@ class DOCX_table_builder:
 
         row_count = max(len(column) for column in columns)
         document = Document()
+        self.add_ojr_header(document)
         table = document.add_table(rows=row_count, cols=len(headers))
         table.style = "Table Grid"
 
