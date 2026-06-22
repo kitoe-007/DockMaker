@@ -213,6 +213,10 @@
                                 <Button Width="24" Height="24" Margin="4" Content="↓" Name="Numeric_bottom_down_button" Click="Numeric_bottom_down_button_Click"/>
                                 <Label Margin="4" Content="Оббрезать снизу" Height="26"></Label>
                             </StackPanel>
+                            <Label Content="Раздел" Height="28"/>
+                            <TextBox Height="24" Width="248" Margin="4, 0, 0, 0" Name="SectionTextBox"/>
+                            <Label Content="Должность, ФИО" Height="28"/>
+                            <TextBox Height="24" Width="248" Margin="4, 0, 0, 4" Name="PositionFioTextBox"/>
 
                         </StackPanel>
                     </StackPanel>

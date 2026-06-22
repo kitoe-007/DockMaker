@@ -146,8 +146,9 @@ namespace Autoaccept_electrical_app
             OJR_template ojr_tem = new OJR_template();
             try
             {
-                ojr_tem.create_table(DocDataGrid, _current_file.json_data, cut_top, cut_bottom, _current_file);
-                
+                string sectionFilter = SectionTextBox.Text?.Trim() ?? "";
+                string positionFio = PositionFioTextBox.Text?.Trim() ?? "";
+                ojr_tem.create_table(DocDataGrid, _current_file.json_data, cut_top, cut_bottom, _current_file, sectionFilter, positionFio);
             }
             catch (System.Exception ex)
             {
@@ -253,7 +254,7 @@ namespace Autoaccept_electrical_app
             try
             {
                 var converter = new DataTable_to_json();
-                File.WriteAllText(jsonPath, converter.ConvertDataTableToJson(_current_file.table_data), new System.Text.UTF8Encoding(false));
+                File.WriteAllText(jsonPath, converter.ConvertDataTableToJson(_current_file.table_data, DocDataGrid), new System.Text.UTF8Encoding(false));
 
                 var launcher = new launch_and_data_extraction();
                 string result = launcher.launch_script(pythonExe, Docx_builder, jsonPath, outputDocx);
