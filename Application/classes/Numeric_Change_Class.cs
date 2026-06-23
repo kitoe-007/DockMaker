@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
+
 namespace Autoaccept_electrical_app.classes
 {
     internal class Numeric_Change_Class

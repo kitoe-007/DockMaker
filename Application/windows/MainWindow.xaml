@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Autoaccept_electrical_app"
+        xmlns:app="clr-namespace:Autoaccept_electrical_app"
         mc:Ignorable="d"
         Title="MainWindow" Height="600" Width="1100"
         MinWidth="900" MinHeight="500"
@@ -35,6 +36,9 @@
             <Setter Property="BorderThickness" Value="0"/>
             <EventSetter Event="PreviewMouseLeftButtonDown" Handler="TreeViewItem_PreviewMouseLeftButtonDown"/>
             <Style.Triggers>
+                <DataTrigger Binding="{Binding IsView}" Value="False">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
                 <Trigger Property="IsSelected" Value="True">
                     <Setter Property="Background" Value="#D2E3FC"/>
                     <Setter Property="FontWeight" Value="SemiBold"/>
@@ -52,25 +56,32 @@
             </Style.Triggers>
         </Style>
 
+        <Style x:Key="TreeDocumentIconStyle" TargetType="Image">
+            <Setter Property="Source" Value="/static/images/document-icon-tree.png"/>
+            <Setter Property="Width" Value="16"/>
+            <Setter Property="Height" Value="16"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Visibility" Value="Collapsed"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsFolder}" Value="False">
+                    <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding IsFolder}" Value="False"/>
+                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem}, Path=IsSelected}" Value="True"/>
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Source" Value="/static/images/document-icon.png"/>
+                </MultiDataTrigger>
+            </Style.Triggers>
+        </Style>
+
         <HierarchicalDataTemplate DataType="{x:Type local:TreeNode}"
                                   ItemsSource="{Binding Children}">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Style="{StaticResource FolderIconStyle}" Text="&#xE8B7;"/>
-                <Image Source="/static/images/document-icon.png"
-                       Width="16" Height="16"
-                       Margin="0,0,8,0"
-                       VerticalAlignment="Center">
-                    <Image.Style>
-                        <Style TargetType="Image">
-                            <Setter Property="Visibility" Value="Collapsed"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsFolder}" Value="False">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Image.Style>
-                </Image>
+                <Image Style="{StaticResource TreeDocumentIconStyle}"/>
                 <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
             </StackPanel>
         </HierarchicalDataTemplate>
@@ -97,7 +108,7 @@
                     </Button>
                     <Button Height="36" Margin="0,0,0,15" Background="#FF0F3B78"
                             BorderBrush="White" BorderThickness="1" HorizontalAlignment="Stretch"
-                            HorizontalContentAlignment="Center">
+                            HorizontalContentAlignment="Center" Click="MoveToStorageButton_Click">
                         <StackPanel Orientation="Horizontal">
                             <Image Source="/static/images/data-icon.png" Width="24" Height="24"/>
                             <TextBlock Text="Данные" Margin="5,0,0,0" Foreground="White" FontWeight="Bold"/>
@@ -140,7 +151,9 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="&#xE721;" FontFamily="Segoe MDL2 Assets"
                                        Foreground="#9AA0A6" Margin="10,0,6,0" VerticalAlignment="Center"/>
-                            <TextBox Grid.Column="1" BorderThickness="0" Background="Transparent"
+                            <TextBox Grid.Column="1" Name="SearchTemplatesTextBox"
+                                     TextChanged="SearchTemplatesTextBox_TextChanged"
+                                     BorderThickness="0" Background="Transparent"
                                      VerticalAlignment="Center" Padding="0,8"
                                      Foreground="#5F6368" FontSize="13">
                                 <TextBox.Style>

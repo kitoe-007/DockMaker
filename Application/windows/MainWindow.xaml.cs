@@ -1,6 +1,7 @@
 ﻿using Autoaccept_electrical_app.auxiliary_modules;
 using Autoaccept_electrical_app.classes;
 using Autoaccept_electrical_app.templates;
+using Autoaccept_electrical_app.windows;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -19,6 +20,7 @@ namespace Autoaccept_electrical_app
     public ObservableCollection<DataSourceFileItem> DataSourceFiles { get; set; }
 
     private FileClass _current_file = new FileClass();
+    private readonly TreeSearchFilterClass _treeSearchFilter = new TreeSearchFilterClass();
 
     // Ключ выбранного шаблона: "OJR" или "ZHV"; null — шаблон не выбран
     private string _currentTemplateKey;
@@ -38,6 +40,11 @@ namespace Autoaccept_electrical_app
         new TreeNode { Name = "ОЖР", IsFolder = false, TemplateKey = "OJR" },
         new TreeNode { Name = "ЖВК", IsFolder = false, TemplateKey = "ZHV" }
       };
+    }
+
+    private void SearchTemplatesTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+      _treeSearchFilter.TreeSearchFilter(Folders, SearchTemplatesTextBox.Text);
     }
 
     private void UpdateZhvPreviewHeader() // обновление заголовков в тектовой части документов
@@ -278,6 +285,13 @@ namespace Autoaccept_electrical_app
                 if (File.Exists(jsonPath))
                     File.Delete(jsonPath);
             }
+        }
+
+        private void MoveToStorageButton_Click(object sender, RoutedEventArgs e)
+        {
+            var storage_window = new StorageWindow();
+            storage_window.Owner = this;
+            storage_window.Show();
         }
     }
 }

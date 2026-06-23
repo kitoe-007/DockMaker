@@ -3,10 +3,168 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Autoaccept_electrical_app.windows"
+        xmlns:app="clr-namespace:Autoaccept_electrical_app"
         mc:Ignorable="d"
-        Title="StorageWindow" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        Title="Хранилище данных" Height="600" Width="523"
+        MinWidth="720" MinHeight="500"
+        FontFamily="Segoe UI" Background="#f7f7f9">
+
+    <Window.Resources>
+        <Style x:Key="FolderIconStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="#5F6368"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsFolder}" Value="False">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="TemplateTreeViewItem" TargetType="TreeViewItem">
+            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+            <Setter Property="Padding" Value="4,6"/>
+            <Setter Property="Margin" Value="0,1"/>
+            <Setter Property="Foreground" Value="#202124"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <EventSetter Event="PreviewMouseLeftButtonDown" Handler="TreeViewItem_PreviewMouseLeftButtonDown"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsView}" Value="False">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#D2E3FC"/>
+                    <Setter Property="FontWeight" Value="SemiBold"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#F1F3F4"/>
+                </Trigger>
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsSelected" Value="True"/>
+                        <Condition Property="IsMouseOver" Value="True"/>
+                    </MultiTrigger.Conditions>
+                    <Setter Property="Background" Value="#D2E3FC"/>
+                </MultiTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="TreeDocumentIconStyle" TargetType="Image">
+            <Setter Property="Source" Value="/static/images/document-icon-tree.png"/>
+            <Setter Property="Width" Value="16"/>
+            <Setter Property="Height" Value="16"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Visibility" Value="Collapsed"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsFolder}" Value="False">
+                    <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding IsFolder}" Value="False"/>
+                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem}, Path=IsSelected}" Value="True"/>
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Source" Value="/static/images/document-icon.png"/>
+                </MultiDataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <HierarchicalDataTemplate DataType="{x:Type app:TreeNode}"
+                                  ItemsSource="{Binding Children}">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Style="{StaticResource FolderIconStyle}" Text="&#xE8B7;"/>
+                <Image Style="{StaticResource TreeDocumentIconStyle}"/>
+                <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+            </StackPanel>
+        </HierarchicalDataTemplate>
+    </Window.Resources>
+
+    <Border BorderBrush="DarkGray" BorderThickness="0,1,0,0">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="120"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Боковая навигация -->
+            <Border Grid.Column="0" Background="#FF0C305D">
+                <StackPanel Margin="10,15,10,0">
+                    
+                </StackPanel>
+            </Border>
+
+            <!-- Основная область -->
+            <Grid Grid.Column="1" Margin="24,20,24,20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Поиск и добавление -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,20" HorizontalAlignment="Left">
+                    <Border BorderBrush="#DADCE0" BorderThickness="1"
+                            CornerRadius="6" Background="White"
+                            Width="280">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="&#xE721;" FontFamily="Segoe MDL2 Assets"
+                                       Foreground="#9AA0A6" Margin="12,0,6,0" VerticalAlignment="Center"/>
+                            <TextBox Grid.Column="1" Name="SearchTextBox"
+                                     TextChanged="SearchTextBox_TextChanged"
+                                     BorderThickness="0" Background="Transparent"
+                                     VerticalAlignment="Center" Padding="0,10"
+                                     Foreground="#202124" FontSize="13">
+                                <TextBox.Style>
+                                    <Style TargetType="TextBox">
+                                        <Style.Triggers>
+                                            <Trigger Property="Text" Value="">
+                                                <Setter Property="Background">
+                                                    <Setter.Value>
+                                                        <VisualBrush AlignmentX="Left" AlignmentY="Center" Stretch="None">
+                                                            <VisualBrush.Visual>
+                                                                <TextBlock Text="Поиск в хранилище"
+                                                                           Foreground="#9AA0A6" FontSize="13" Margin="0,0,8,0"/>
+                                                            </VisualBrush.Visual>
+                                                        </VisualBrush>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBox.Style>
+                            </TextBox>
+                        </Grid>
+                    </Border>
+                    <Button Height="38" MinWidth="120" Margin="12,0,0,0"
+                            Background="Transparent" BorderBrush="#DADCE0" BorderThickness="1"
+                            Cursor="Hand" VerticalAlignment="Center"
+                            Click="AddFolderButton_Click">
+                        <TextBlock Text="Добавить папку" Foreground="#5F6368" FontWeight="SemiBold" FontSize="13"/>
+                    </Button>
+                    <Button Height="38" MinWidth="108" Margin="8,0,0,0"
+                            Background="#FF135FD6" BorderThickness="0" Cursor="Hand"
+                            VerticalAlignment="Center" Click="AddFileButton_Click">
+                        <TextBlock Text="Добавить" Foreground="White" FontWeight="SemiBold" FontSize="13"/>
+                    </Button>
+                </StackPanel>
+
+                <!-- Дерево хранилища -->
+                <TreeView Grid.Row="1"
+                          Name="StorageTreeView"
+                          ItemsSource="{Binding Folders}"
+                          BorderThickness="0"
+                          Background="Transparent"
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                          ItemContainerStyle="{StaticResource TemplateTreeViewItem}"/>
+            </Grid>
+        </Grid>
+    </Border>
 </Window>

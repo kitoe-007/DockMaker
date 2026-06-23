@@ -354,6 +354,10 @@ paket-files/
 **/__pycache__/
 *.pyc
 
+# User storage data (keep folder structure only)
+data/*
+!data/.gitkeep
+
 # Cake - Uncomment if you are using it
 #tools/**
 #!tools/packages.config
