@@ -22,14 +22,14 @@ namespace Autoaccept_electrical_app.classes
             return s.Substring(first, last - first + 1).Trim();
         }
 
-        Dictionary<string, JsonElement> ConvertJsonToDictionary(string jsonString)
+        static Dictionary<string, JsonElement> ConvertJsonToDictionary(string jsonString)
         {
             string clean = ExtractJsonObject(jsonString);
             return JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(clean)
                    ?? new Dictionary<string, JsonElement>();
         }
 
-        List<string> ConvertJsonDictElementToStringArray(Dictionary<string, JsonElement> dict, string key) {
+        static List<string> ConvertJsonDictElementToStringArray(Dictionary<string, JsonElement> dict, string key) {
             if (dict.TryGetValue(key, out JsonElement columnElement))
             {
                 
@@ -44,7 +44,7 @@ namespace Autoaccept_electrical_app.classes
             return new List<string>();
         }
 
-        public List<List<string>> ConvertJsonToStringArray(string jsonString)
+        static public List<List<string>> ConvertJsonToStringArray(string jsonString)
         {
             try
             {

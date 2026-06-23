@@ -9,11 +9,10 @@ namespace Autoaccept_electrical_app.templates
 {
     /// <summary>
     /// Шаблон ЖВК — журнал входного учёта и контроля качества материалов.
-    /// В отличие от ОЖР, каждая позиция из Excel даёт отдельную строку (без группировки по дате).
     /// </summary>
     internal class ZHV_template
     {
-        // Индексы столбцов в JSON из XLSX_extractor (column_0, column_2, column_4)
+        
         private const int ExcelColDate = 0;
         private const int ExcelColSection = 2;
         private const int ExcelColMaterialName = 4;
@@ -39,7 +38,7 @@ namespace Autoaccept_electrical_app.templates
             dg.ItemsSource = null;
         }
 
-        // Сравнение разделов без учёта регистра, пробелов и дефисов (как в OJR_template)
+        // Сравнение разделов без учёта регистра, пробелов и дефисов 
         private static string NormalizeSection(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -75,10 +74,6 @@ namespace Autoaccept_electrical_app.templates
             return column[rowIndex] ?? "";
         }
 
-        /// <param name="sectionFilter">Раздел из UI; пустая строка — без фильтрации</param>
-        /// <param name="controlType">Вид контроля по умолчанию для всех строк</param>
-        /// <param name="controlResult">Результат контроля по умолчанию</param>
-        /// <param name="inspectorFio">Подпись лица, осуществляющего контроль</param>
         public void create_table(
             DataGrid dg,
             List<List<string>> data,
@@ -105,12 +100,12 @@ namespace Autoaccept_electrical_app.templates
                 table.Columns.Add($"column_{c}", typeof(string));
 
             int ind = 0;
-            // «Текущие» дата и раздел наследуются вниз по листу, пока не встретится новое значение
+            // дата и раздел идут вниз по листу, пока не встретится новое значение
             string currentSection = "";
             string currentDate = "";
             bool inMatchingSection = !useSectionFilter;
 
-            // Строка 0 в Excel — заголовок; cut_top/cut_bottom обрезают лишние строки
+            // Строка 0 заголовок cut_top/cut_bottom обрезают лишние строки
             int start = 1 + cut_top;
             int endExclusive = data[0].Count - cut_bottom;
             if (start < 1) start = 1;
@@ -140,7 +135,6 @@ namespace Autoaccept_electrical_app.templates
                 if (!inMatchingSection || string.IsNullOrEmpty(nameVal))
                     continue;
 
-                // Дата может быть только в «якорной» строке; для продолжений берём currentDate
                 string rowDate = !string.IsNullOrEmpty(dateVal) ? dateVal : currentDate;
                 if (string.IsNullOrEmpty(rowDate))
                     continue;
@@ -150,7 +144,7 @@ namespace Autoaccept_electrical_app.templates
                 row[0] = ind.ToString();
                 row[1] = rowDate;
                 row[2] = nameVal;
-                // Кол-во, поставщик и сопроводительный документ в Excel не заполняются
+
                 row[3] = "";
                 row[4] = "";
                 row[5] = "";

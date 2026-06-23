@@ -14,7 +14,7 @@ namespace Autoaccept_electrical_app.auxiliary_modules
     internal class launch_and_data_extraction
     {
         public
-            string launch_script(string Script_path, params object[] args)
+            static string launch_script(string Script_path, params object[] args)
             {
             try
             {

@@ -19,13 +19,14 @@ namespace Autoaccept_electrical_app
     public ObservableCollection<DataSourceFileItem> DataSourceFiles { get; set; }
 
     private FileClass _current_file = new FileClass();
+
     // Ключ выбранного шаблона: "OJR" или "ZHV"; null — шаблон не выбран
     private string _currentTemplateKey;
 
     public MainWindow()
     {
       InitializeComponent();
-      Folders = BuildTemplateTree();
+      Folders = BuildTemplateTree(); // создание дерева шаблонов
       DataSourceFiles = new ObservableCollection<DataSourceFileItem>();
       DataContext = this;
     }
@@ -39,13 +40,20 @@ namespace Autoaccept_electrical_app
       };
     }
 
-    private static string ResolveProjectPath(params string[] relativeParts)
+    private void UpdateZhvPreviewHeader() // обновление заголовков в тектовой части документов
     {
-      var parts = new[] { AppDomain.CurrentDomain.BaseDirectory, "..", "..", ".." }
-        .Concat(relativeParts)
-        .ToArray();
-      return Path.GetFullPath(Path.Combine(parts));
-    }
+            UpdateZhvPreviewHeaderClass.Update(
+                ZhvPreviewObjectName,
+                ZhvPreviewObjectAddress,
+                ZhvPreviewOrganization,
+                ZhvPreviewStartedDate,
+                ZhvPreviewFinishedDate,
+                ObjectNameTextBox.Text,
+                ObjectAddressTextBox.Text,
+                OrganizationTextBox.Text,
+                StartedDateTextBox.Text,
+                FinishedDateTextBox.Text);
+     }
 
     private void TemplatesTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
@@ -72,25 +80,10 @@ namespace Autoaccept_electrical_app
       _currentTemplateKey = newTemplateKey;
 
       if (isZhv)
-        UpdateZhvPreviewHeader();
+           UpdateZhvPreviewHeader();
     }
 
-    // Текст шапки ЖВК в предпросмотре синхронизируется с полями параметров
-    private void UpdateZhvPreviewHeader()
-    {
-      ZhvPreviewObjectName.Text = FormatLabeledField("Наименование объекта", ObjectNameTextBox.Text);
-      ZhvPreviewObjectAddress.Text = FormatLabeledField("Адрес объекта", ObjectAddressTextBox.Text);
-      ZhvPreviewOrganization.Text = FormatLabeledField("Наименование строительной организации", OrganizationTextBox.Text);
-      ZhvPreviewStartedDate.Text = FormatLabeledField("Начат", StartedDateTextBox.Text);
-      ZhvPreviewFinishedDate.Text = FormatLabeledField("Окончен", FinishedDateTextBox.Text);
-    }
-
-    private static string FormatLabeledField(string label, string value)
-    {
-      return string.IsNullOrWhiteSpace(value) ? "" : $"{label}  {value.Trim()}";
-    }
-
-    private void TreeViewItem_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void TreeViewItem_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
       var item = sender as TreeViewItem;
       if (item?.DataContext is TreeNode node && node.IsFolder && node.Children.Count > 0)
@@ -110,8 +103,6 @@ namespace Autoaccept_electrical_app
             }
 
             DocDataGrid.ItemsSource = null;
-            Json_to_array_convertor js_con = new Json_to_array_convertor();
-            launch_and_data_extraction launch_script = new launch_and_data_extraction();
             
             int cut_top = 0;
             int cut_bottom = 0;
@@ -123,22 +114,22 @@ namespace Autoaccept_electrical_app
 
             if (cut_top < 0) cut_top = 0;
             if (cut_bottom < 0) cut_bottom = 0;
-            string pythonExe = ResolveProjectPath("File_extractors", ".venv", "Scripts", "python.exe");
-            string extractorPy = ResolveProjectPath("File_extractors", "XLSX_extractor.py");
+            string pythonExe = ResolveProjectPathClass.ResolveProjectPath("File_extractors", ".venv", "Scripts", "python.exe");
+            string extractorPy = ResolveProjectPathClass.ResolveProjectPath("File_extractors", "XLSX_extractor.py");
             string xlsx = DataSourceFileComboBox.SelectedValue as string;
             if (xlsx == null) 
             {
                 MessageBox.Show("Не выбран источник данных.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             } 
-            string json = launch_script.launch_script(pythonExe, extractorPy, xlsx);
+            string json = launch_and_data_extraction.launch_script(pythonExe, extractorPy, xlsx);
             if (string.IsNullOrWhiteSpace(json) || json.Trim() == "Ошибки")
             {
                 MessageBox.Show("Не удалось получить данные из Excel. Проверьте путь к Python/.venv и файлу Excel.xlsx.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
-            _current_file.json_data = js_con.ConvertJsonToStringArray(json);
+            _current_file.json_data = Json_to_array_convertor.ConvertJsonToStringArray(json);
             if (_current_file.json_data.Count == 0)
             {
                 string preview = json.Trim();
@@ -209,64 +200,26 @@ namespace Autoaccept_electrical_app
             DataSourceFileComboBox.SelectedValue = filePath;
         }
 
-        private void Numeric_change(TextBox numeric, int delta)
-        {
-            numeric.Text = Numeric_up_down_cut_top.Text.All(char.IsDigit) ? (int.Parse(numeric.Text) + delta).ToString() : "0";
-        }
+
+        // логика для numeric
         private void Numeric_top_up_button_Click(object sender, RoutedEventArgs e)
         {
-            bool isOnlyDigits = Numeric_up_down_cut_top.Text.All(char.IsDigit);
-            if (isOnlyDigits) {
-                int value = int.Parse(Numeric_up_down_cut_top.Text);
-                Numeric_up_down_cut_top.Text = (value+1).ToString();
-            }
-            else
-            {
-                Numeric_up_down_cut_top.Text = "0";
-            }
-            
+            Numeric_Change_Class.Numeric_change(Numeric_up_down_cut_top, 1);
         }
 
         private void Numeric_top_down_button_Click(object sender, RoutedEventArgs e)
         {
-            bool isOnlyDigits = Numeric_up_down_cut_top.Text.All(char.IsDigit);
-            if (isOnlyDigits)
-            {
-                int value = int.Parse(Numeric_up_down_cut_top.Text);
-                Numeric_up_down_cut_top.Text = (value - 1).ToString();
-            }
-            else
-            {
-                Numeric_up_down_cut_top.Text = "0";
-            }
+            Numeric_Change_Class.Numeric_change(Numeric_up_down_cut_top, -1);
         }
 
         private void Numeric_bottom_up_button_Click(object sender, RoutedEventArgs e)
         {
-            bool isOnlyDigits = Numeric_up_down_cut_bottom.Text.All(char.IsDigit);
-            if (isOnlyDigits)
-            {
-                int value = int.Parse(Numeric_up_down_cut_bottom.Text);
-                Numeric_up_down_cut_bottom.Text = (value + 1).ToString();
-            }
-            else
-            {
-                Numeric_up_down_cut_bottom.Text = "0";
-            }
+            Numeric_Change_Class.Numeric_change(Numeric_up_down_cut_bottom, 1);
         }
 
         private void Numeric_bottom_down_button_Click(object sender, RoutedEventArgs e)
         {
-            bool isOnlyDigits = Numeric_up_down_cut_bottom.Text.All(char.IsDigit);
-            if (isOnlyDigits)
-            {
-                int value = int.Parse(Numeric_up_down_cut_bottom.Text);
-                Numeric_up_down_cut_bottom.Text = (value - 1).ToString();
-            }
-            else
-            {
-                Numeric_up_down_cut_bottom.Text = "0";
-            }
+            Numeric_Change_Class.Numeric_change(Numeric_up_down_cut_bottom, -1);
         }
 
         // Метаданные с префиксом «_» попадают в JSON и читаются DOCX_table_builder.py (не в таблицу)
@@ -301,8 +254,8 @@ namespace Autoaccept_electrical_app
             if (!dialog_manager.SaveFileDialog())
                 return;
 
-            string pythonExe = ResolveProjectPath("File_extractors", ".venv", "Scripts", "python.exe");
-            string Docx_builder = ResolveProjectPath("File_builder", "DOCX_table_builder.py");
+            string pythonExe = ResolveProjectPathClass.ResolveProjectPath("File_extractors", ".venv", "Scripts", "python.exe");
+            string Docx_builder = ResolveProjectPathClass.ResolveProjectPath("File_builder", "DOCX_table_builder.py");
             string outputDocx = dialog_manager.FilePath;
 
             string jsonPath = Path.Combine(Path.GetTempPath(), $"aae_table_{Guid.NewGuid():N}.json");
@@ -314,8 +267,7 @@ namespace Autoaccept_electrical_app
                     converter.ConvertDataTableToJson(_current_file.table_data, DocDataGrid, BuildSaveMetadata()),
                     new System.Text.UTF8Encoding(false));
 
-                var launcher = new launch_and_data_extraction();
-                string result = launcher.launch_script(pythonExe, Docx_builder, jsonPath, outputDocx);
+                string result = launch_and_data_extraction.launch_script(pythonExe, Docx_builder, jsonPath, outputDocx);
                 if (result == "Ошибки")
                     return;
 

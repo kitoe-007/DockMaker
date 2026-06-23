@@ -94,6 +94,9 @@
     <Compile Include="classes\Dialogs.cs" />
     <Compile Include="classes\FileClass.cs" />
     <Compile Include="classes\Json_to_array_convertor.cs" />
+    <Compile Include="classes\Numeric_Change_Class.cs" />
+    <Compile Include="classes\ResolveProjectPathClass.cs" />
+    <Compile Include="classes\UpdateZhvPreviewHeaderClass.cs" />
     <Compile Include="templates\OJR_template.cs" />
     <Compile Include="templates\ZHV_template.cs" />
     <Compile Include="windows\App.xaml.cs">
