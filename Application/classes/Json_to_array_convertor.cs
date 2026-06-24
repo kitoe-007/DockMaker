@@ -7,8 +7,15 @@ using System.Text.Json;
 
 namespace Autoaccept_electrical_app.classes
 {
+    /// <summary>
+    /// Преобразование JSON от Python-экстрактора в двумерный массив строк по столбцам Excel.
+    /// </summary>
     public class Json_to_array_convertor
     {
+        /// <summary>
+        /// Извлекает JSON-объект из stdout Python (отсекает лишний текст до «{» и после «}»).
+        /// </summary>
+        /// <param name="s">Сырой вывод процесса.</param>
         static string ExtractJsonObject(string s)
         {
             if (string.IsNullOrWhiteSpace(s))
@@ -22,6 +29,10 @@ namespace Autoaccept_electrical_app.classes
             return s.Substring(first, last - first + 1).Trim();
         }
 
+        /// <summary>
+        /// Десериализует JSON-строку в словарь полей.
+        /// </summary>
+        /// <param name="jsonString">JSON-текст от экстрактора.</param>
         static Dictionary<string, JsonElement> ConvertJsonToDictionary(string jsonString)
         {
             string clean = ExtractJsonObject(jsonString);
@@ -29,6 +40,11 @@ namespace Autoaccept_electrical_app.classes
                    ?? new Dictionary<string, JsonElement>();
         }
 
+        /// <summary>
+        /// Возвращает массив строк одного столбца по ключу column_N.
+        /// </summary>
+        /// <param name="dict">Словарь полей JSON.</param>
+        /// <param name="key">Имя столбца (например, column_0).</param>
         static List<string> ConvertJsonDictElementToStringArray(Dictionary<string, JsonElement> dict, string key) {
             if (dict.TryGetValue(key, out JsonElement columnElement))
             {
@@ -44,6 +60,10 @@ namespace Autoaccept_electrical_app.classes
             return new List<string>();
         }
 
+        /// <summary>
+        /// Конвертирует JSON экстрактора в список столбцов Excel.
+        /// </summary>
+        /// <param name="jsonString">Сырой вывод XLSX_extractor.py.</param>
         static public List<List<string>> ConvertJsonToStringArray(string jsonString)
         {
             try

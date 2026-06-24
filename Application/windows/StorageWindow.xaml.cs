@@ -9,14 +9,21 @@ using System.Windows.Media;
 
 namespace Autoaccept_electrical_app.windows
 {
+    /// <summary>
+    /// Окно управления файловым хранилищем: папки, файлы, переименование и удаление.
+    /// </summary>
     public partial class StorageWindow : Window
     {
         private readonly TreeSearchFilterClass _treeSearchFilter = new TreeSearchFilterClass();
         private readonly StorageTreeServiceClass _storageTreeService = new StorageTreeServiceClass();
         private TreeNode _selectedStorageNode;
 
+        /// <summary>Дерево папок и файлов хранилища.</summary>
         public ObservableCollection<TreeNode> Folders { get; set; }
 
+        /// <summary>
+        /// Загружает дерево хранилища и привязывает его к интерфейсу.
+        /// </summary>
         public StorageWindow()
         {
             InitializeComponent();
@@ -25,6 +32,9 @@ namespace Autoaccept_electrical_app.windows
             ReloadStorageTree();
         }
 
+        /// <summary>
+        /// Перечитывает дерево с диска и применяет текущий фильтр поиска.
+        /// </summary>
         private void ReloadStorageTree()
         {
             Folders.Clear();
@@ -34,21 +44,39 @@ namespace Autoaccept_electrical_app.windows
             _treeSearchFilter.TreeSearchFilter(Folders, SearchTextBox.Text);
         }
 
+        /// <summary>
+        /// Фильтрует дерево хранилища по введённому тексту.
+        /// </summary>
+        /// <param name="sender">Поле поиска.</param>
+        /// <param name="e">Аргументы события изменения текста.</param>
         private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             _treeSearchFilter.TreeSearchFilter(Folders, SearchTextBox.Text);
         }
 
+        /// <summary>
+        /// Запоминает выбранный узел дерева хранилища.
+        /// </summary>
+        /// <param name="sender">Дерево хранилища.</param>
+        /// <param name="e">Аргументы события смены выбранного элемента.</param>
         private void StorageTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             _selectedStorageNode = e.NewValue as TreeNode;
         }
 
+        /// <summary>
+        /// Возвращает выбранный узел из поля или из TreeView.
+        /// </summary>
         private TreeNode GetEffectiveSelectedNode()
         {
             return _selectedStorageNode ?? StorageTreeView.SelectedItem as TreeNode;
         }
 
+        /// <summary>
+        /// Создаёт новую папку в выбранном каталоге хранилища.
+        /// </summary>
+        /// <param name="sender">Кнопка «Добавить папку».</param>
+        /// <param name="e">Аргументы события нажатия.</param>
         private void AddFolderButton_Click(object sender, RoutedEventArgs e)
         {
             string folderName = Interaction.InputBox("Введите имя папки:", "Новая папка", "");
@@ -66,6 +94,11 @@ namespace Autoaccept_electrical_app.windows
             ReloadStorageTree();
         }
 
+        /// <summary>
+        /// Копирует выбранный файл в каталог хранилища.
+        /// </summary>
+        /// <param name="sender">Кнопка «Добавить файл».</param>
+        /// <param name="e">Аргументы события нажатия.</param>
         private void AddFileButton_Click(object sender, RoutedEventArgs e)
         {
             var selected = GetEffectiveSelectedNode();
@@ -84,6 +117,9 @@ namespace Autoaccept_electrical_app.windows
             ReloadStorageTree();
         }
 
+        /// <summary>
+        /// Возвращает выбранный узел или показывает предупреждение, если ничего не выбрано.
+        /// </summary>
         private TreeNode GetSelectedNodeOrWarn()
         {
             var selected = GetEffectiveSelectedNode();
@@ -97,6 +133,11 @@ namespace Autoaccept_electrical_app.windows
             return selected;
         }
 
+        /// <summary>
+        /// Переименовывает выбранный файл или папку.
+        /// </summary>
+        /// <param name="sender">Кнопка «Переименовать».</param>
+        /// <param name="e">Аргументы события нажатия.</param>
         private void RenameItemButton_Click(object sender, RoutedEventArgs e)
         {
             var selected = GetSelectedNodeOrWarn();
@@ -117,6 +158,11 @@ namespace Autoaccept_electrical_app.windows
             ReloadStorageTree();
         }
 
+        /// <summary>
+        /// Удаляет выбранный файл или папку после подтверждения.
+        /// </summary>
+        /// <param name="sender">Кнопка «Удалить».</param>
+        /// <param name="e">Аргументы события нажатия.</param>
         private void DeleteItemButton_Click(object sender, RoutedEventArgs e)
         {
             var selected = GetSelectedNodeOrWarn();
@@ -142,6 +188,11 @@ namespace Autoaccept_electrical_app.windows
             ReloadStorageTree();
         }
 
+        /// <summary>
+        /// Обрабатывает клик по папке: выбор и раскрытие/сворачивание.
+        /// </summary>
+        /// <param name="sender">Элемент дерева TreeViewItem.</param>
+        /// <param name="e">Аргументы события нажатия кнопки мыши.</param>
         private void TreeViewItem_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             var item = sender as TreeViewItem;
@@ -165,6 +216,11 @@ namespace Autoaccept_electrical_app.windows
             }
         }
 
+        /// <summary>
+        /// Открывает файл по двойному щелчку в системном приложении.
+        /// </summary>
+        /// <param name="sender">Элемент дерева TreeViewItem.</param>
+        /// <param name="e">Аргументы события двойного щелчка.</param>
         private void TreeViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             var item = sender as TreeViewItem;
@@ -186,6 +242,10 @@ namespace Autoaccept_electrical_app.windows
             }
         }
 
+        /// <summary>
+        /// Находит родительский TreeViewItem для элемента визуального дерева.
+        /// </summary>
+        /// <param name="source">Элемент визуального дерева.</param>
         private static TreeViewItem GetTreeViewItemFromSource(DependencyObject source)
         {
             while (source != null)
@@ -199,6 +259,11 @@ namespace Autoaccept_electrical_app.windows
             return null;
         }
 
+        /// <summary>
+        /// Возвращает фокус на главное окно и закрывает окно хранилища.
+        /// </summary>
+        /// <param name="sender">Кнопка возврата к документам.</param>
+        /// <param name="e">Аргументы события нажатия.</param>
         private void MoveToDocumentsButton_Click(object sender, RoutedEventArgs e)
         {
             if (Owner != null)

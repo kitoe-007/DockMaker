@@ -7,10 +7,17 @@ using System.Windows.Controls;
 
 namespace Autoaccept_electrical_app.templates
 {
+    /// <summary>
+    /// Шаблон ОЖР — общий журнал работ, раздел 3.
+    /// </summary>
     internal class OJR_template
     {
         public string Name { get; set; }
 
+        /// <summary>
+        /// Задаёт русские заголовки столбцов таблицы ОЖР.
+        /// </summary>
+        /// <param name="dg">Сетка предпросмотра документа.</param>
         private void set_headers(DataGrid dg)
         {
             if (dg.Columns.Count < 4) return;
@@ -21,12 +28,20 @@ namespace Autoaccept_electrical_app.templates
             dg.Columns[3].Header = "Должность, фамилия, инициалы, подпись уполномоченного\nпредставителя лица, осуществляющего строительство";
         }
 
+        /// <summary>
+        /// Очищает DataGrid перед построением новой таблицы.
+        /// </summary>
+        /// <param name="dg">Сетка предпросмотра документа.</param>
         private void clear_table(DataGrid dg)
         {
             dg.Columns.Clear();
             dg.ItemsSource = null;
         }
 
+        /// <summary>
+        /// Нормализует код раздела для сравнения (без регистра, пробелов и дефисов).
+        /// </summary>
+        /// <param name="name">Исходный код раздела.</param>
         private static string NormalizeSection(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -35,6 +50,11 @@ namespace Autoaccept_electrical_app.templates
             return name.Trim().ToUpperInvariant().Replace(" ", "").Replace("-", "");
         }
 
+        /// <summary>
+        /// Проверяет, входит ли текущий раздел в фильтр (несколько значений через запятую).
+        /// </summary>
+        /// <param name="currentSection">Текущий раздел строки Excel.</param>
+        /// <param name="sectionFilter">Строка фильтра разделов.</param>
         private static bool SectionMatches(string currentSection, string sectionFilter)
         {
             var current = NormalizeSection(currentSection);
@@ -49,6 +69,12 @@ namespace Autoaccept_electrical_app.templates
             return allowed.Any(s => s == current);
         }
 
+        /// <summary>
+        /// Безопасно читает ячейку из столбцового представления данных Excel.
+        /// </summary>
+        /// <param name="data">Данные Excel в столбцовом виде.</param>
+        /// <param name="columnIndex">Индекс столбца.</param>
+        /// <param name="rowIndex">Индекс строки.</param>
         private static string GetCell(List<List<string>> data, int columnIndex, int rowIndex)
         {
             if (data == null || columnIndex < 0 || columnIndex >= data.Count)
@@ -61,6 +87,12 @@ namespace Autoaccept_electrical_app.templates
             return column[rowIndex] ?? "";
         }
 
+        /// <summary>
+        /// Добавляет значение в ячейку, объединяя несколько строк через перенос.
+        /// </summary>
+        /// <param name="row">Строка таблицы предпросмотра.</param>
+        /// <param name="columnIndex">Индекс столбца.</param>
+        /// <param name="value">Добавляемое значение.</param>
         private static void AppendColumnValue(DataRow row, int columnIndex, string value)
         {
             if (string.IsNullOrEmpty(value))
@@ -70,6 +102,11 @@ namespace Autoaccept_electrical_app.templates
             row[columnIndex] = string.IsNullOrEmpty(prev) ? value : prev + ",\n " + value;
         }
 
+        /// <summary>
+        /// Завершает текущую строку и добавляет её в таблицу.
+        /// </summary>
+        /// <param name="table">Целевая таблица.</param>
+        /// <param name="currentRow">Текущая формируемая строка (сбрасывается в null).</param>
         private static void FlushRow(DataTable table, ref DataRow currentRow)
         {
             if (currentRow == null)
@@ -79,6 +116,16 @@ namespace Autoaccept_electrical_app.templates
             currentRow = null;
         }
 
+        /// <summary>
+        /// Строит таблицу ОЖР из данных Excel и отображает её в DataGrid.
+        /// </summary>
+        /// <param name="dg">Сетка предпросмотра документа.</param>
+        /// <param name="data">Данные Excel в столбцовом виде.</param>
+        /// <param name="cut_top">Число строк обрезки сверху.</param>
+        /// <param name="cut_bottom">Число строк обрезки снизу.</param>
+        /// <param name="current_file">Объект состояния текущего документа.</param>
+        /// <param name="sectionFilter">Фильтр по разделу (пустой — без фильтра).</param>
+        /// <param name="positionFio">Должность и ФИО уполномоченного представителя.</param>
         public void create_table(DataGrid dg, List<List<string>> data, int cut_top, int cut_bottom, FileClass current_file, string sectionFilter, string positionFio)
         {
             clear_table(dg);

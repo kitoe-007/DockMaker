@@ -12,11 +12,14 @@ namespace Autoaccept_electrical_app.templates
     /// </summary>
     internal class ZHV_template
     {
-        
         private const int ExcelColDate = 0;
         private const int ExcelColSection = 2;
         private const int ExcelColMaterialName = 4;
 
+        /// <summary>
+        /// Задаёт русские заголовки столбцов таблицы ЖВК.
+        /// </summary>
+        /// <param name="dg">Сетка предпросмотра документа.</param>
         private void set_headers(DataGrid dg)
         {
             if (dg.Columns.Count < 9) return;
@@ -32,13 +35,20 @@ namespace Autoaccept_electrical_app.templates
             dg.Columns[8].Header = "Подпись лица, осуществляющего контроль";
         }
 
+        /// <summary>
+        /// Очищает DataGrid перед построением новой таблицы.
+        /// </summary>
+        /// <param name="dg">Сетка предпросмотра документа.</param>
         private void clear_table(DataGrid dg)
         {
             dg.Columns.Clear();
             dg.ItemsSource = null;
         }
 
-        // Сравнение разделов без учёта регистра, пробелов и дефисов 
+        /// <summary>
+        /// Нормализует код раздела для сравнения (без регистра, пробелов и дефисов).
+        /// </summary>
+        /// <param name="name">Исходный код раздела.</param>
         private static string NormalizeSection(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -47,7 +57,11 @@ namespace Autoaccept_electrical_app.templates
             return name.Trim().ToUpperInvariant().Replace(" ", "").Replace("-", "");
         }
 
-        // Фильтр «Раздел» поддерживает несколько значений через запятую: «АК-1, ЭМ-5»
+        /// <summary>
+        /// Проверяет, входит ли текущий раздел в фильтр (несколько значений через запятую).
+        /// </summary>
+        /// <param name="currentSection">Текущий раздел строки Excel.</param>
+        /// <param name="sectionFilter">Строка фильтра разделов.</param>
         private static bool SectionMatches(string currentSection, string sectionFilter)
         {
             var current = NormalizeSection(currentSection);
@@ -62,6 +76,12 @@ namespace Autoaccept_electrical_app.templates
             return allowed.Any(s => s == current);
         }
 
+        /// <summary>
+        /// Безопасно читает ячейку из столбцового представления данных Excel.
+        /// </summary>
+        /// <param name="data">Данные Excel в столбцовом виде.</param>
+        /// <param name="columnIndex">Индекс столбца.</param>
+        /// <param name="rowIndex">Индекс строки.</param>
         private static string GetCell(List<List<string>> data, int columnIndex, int rowIndex)
         {
             if (data == null || columnIndex < 0 || columnIndex >= data.Count)
@@ -74,6 +94,19 @@ namespace Autoaccept_electrical_app.templates
             return column[rowIndex] ?? "";
         }
 
+        /// <summary>
+        /// Строит таблицу ЖВК из данных Excel и отображает её в DataGrid.
+        /// </summary>
+        /// <param name="dg">Сетка предпросмотра документа.</param>
+        /// <param name="data">Данные Excel в столбцовом виде.</param>
+        /// <param name="cut_top">Число строк обрезки сверху.</param>
+        /// <param name="cut_bottom">Число строк обрезки снизу.</param>
+        /// <param name="current_file">Объект состояния текущего документа.</param>
+        /// <param name="sectionFilter">Фильтр по разделу (пустой — без фильтра).</param>
+        /// <param name="supplier">Поставщик по умолчанию для строк.</param>
+        /// <param name="controlType">Вид контроля по умолчанию.</param>
+        /// <param name="controlResult">Результат контроля по умолчанию.</param>
+        /// <param name="inspectorFio">ФИО контролирующего лица.</param>
         public void create_table(
             DataGrid dg,
             List<List<string>> data,
@@ -81,6 +114,7 @@ namespace Autoaccept_electrical_app.templates
             int cut_bottom,
             FileClass current_file,
             string sectionFilter,
+            string supplier,
             string controlType,
             string controlResult,
             string inspectorFio)
@@ -91,6 +125,7 @@ namespace Autoaccept_electrical_app.templates
                 return;
 
             bool useSectionFilter = !string.IsNullOrWhiteSpace(sectionFilter);
+            string defaultSupplier = supplier?.Trim() ?? "";
             string defaultControlType = string.IsNullOrWhiteSpace(controlType) ? "Визуальный" : controlType.Trim();
             string defaultControlResult = string.IsNullOrWhiteSpace(controlResult) ? "Пригоден" : controlResult.Trim();
             string defaultInspectorFio = inspectorFio?.Trim() ?? "";
@@ -105,7 +140,7 @@ namespace Autoaccept_electrical_app.templates
             string currentDate = "";
             bool inMatchingSection = !useSectionFilter;
 
-            // Строка 0 заголовок cut_top/cut_bottom обрезают лишние строки
+            // строки 1..N: cut_top/cut_bottom обрезают лишние строки сверху и снизу
             int start = 1 + cut_top;
             int endExclusive = data[0].Count - cut_bottom;
             if (start < 1) start = 1;
@@ -146,7 +181,7 @@ namespace Autoaccept_electrical_app.templates
                 row[2] = nameVal;
 
                 row[3] = "";
-                row[4] = "";
+                row[4] = defaultSupplier;
                 row[5] = "";
                 row[6] = defaultControlType;
                 row[7] = defaultControlResult;

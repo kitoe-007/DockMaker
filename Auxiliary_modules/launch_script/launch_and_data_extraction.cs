@@ -11,8 +11,17 @@ using System.Windows;
 
 namespace Autoaccept_electrical_app.auxiliary_modules
 {
+    /// <summary>
+    /// Запуск Python-скриптов и чтение результата из stdout.
+    /// </summary>
     internal class launch_and_data_extraction
     {
+        /// <summary>
+        /// Запускает внешний процесс (Python) с аргументами и возвращает stdout.
+        /// </summary>
+        /// <param name="Script_path">Путь к исполняемому файлу (python.exe).</param>
+        /// <param name="args">Путь к скрипту и его аргументы.</param>
+        /// <returns>Вывод скрипта или «Ошибки» при сбое.</returns>
         public
             static string launch_script(string Script_path, params object[] args)
             {
@@ -32,10 +41,10 @@ namespace Autoaccept_electrical_app.auxiliary_modules
                 p.StartInfo.FileName = Script_path;
                 p.StartInfo.Arguments = arguments;
 
-                p.StartInfo.UseShellExecute = false;       // перенаправления - false = Да
-                p.StartInfo.RedirectStandardOutput = true; // перенаправить stdout
-                p.StartInfo.RedirectStandardError = true;  // для ошибок
-                p.StartInfo.CreateNoWindow = true;         // скрыть окно консоли
+                p.StartInfo.UseShellExecute = false;
+                p.StartInfo.RedirectStandardOutput = true;
+                p.StartInfo.RedirectStandardError = true;
+                p.StartInfo.CreateNoWindow = true;
 
                 p.StartInfo.StandardOutputEncoding = System.Text.Encoding.UTF8;
                 p.StartInfo.StandardErrorEncoding = System.Text.Encoding.UTF8;
@@ -45,7 +54,7 @@ namespace Autoaccept_electrical_app.auxiliary_modules
                 string output = p.StandardOutput.ReadToEnd();
                 string error = p.StandardError.ReadToEnd();
 
-                p.WaitForExit(); // завершения процесса
+                p.WaitForExit();
 
                 if (!string.IsNullOrEmpty(error))
                     throw new Exception($"Ошибка скрипта: {error}");
@@ -60,6 +69,5 @@ namespace Autoaccept_electrical_app.auxiliary_modules
         }
     }
 }
-
 
 

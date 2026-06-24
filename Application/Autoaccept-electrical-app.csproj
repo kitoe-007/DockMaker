@@ -89,6 +89,15 @@
     </ApplicationDefinition>
     <Compile Include="classes\TreeSearchFilterClass.cs" />
     <Compile Include="classes\StorageTreeServiceClass.cs" />
+    <Compile Include="classes\validation\CommonFieldsValidator.cs" />
+    <Compile Include="classes\validation\GenerateDocumentValidator.cs" />
+    <Compile Include="classes\validation\SaveDocumentValidator.cs" />
+    <Compile Include="classes\validation\SectionDocumentValidator.cs" />
+    <Compile Include="classes\validation\SectionValidationHelper.cs" />
+    <Compile Include="classes\validation\TemplateFormFields.cs" />
+    <Compile Include="classes\validation\ValidationDialog.cs" />
+    <Compile Include="classes\validation\ValidationResult.cs" />
+    <Compile Include="classes\validation\ZhvFieldsValidator.cs" />
     <Compile Include="windows\StorageWindow.xaml.cs">
       <DependentUpon>StorageWindow.xaml</DependentUpon>
     </Compile>

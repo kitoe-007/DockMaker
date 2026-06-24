@@ -1,5 +1,6 @@
 ﻿using Autoaccept_electrical_app.auxiliary_modules;
 using Autoaccept_electrical_app.classes;
+using Autoaccept_electrical_app.classes.validation;
 using Autoaccept_electrical_app.templates;
 using Autoaccept_electrical_app.windows;
 using System;
@@ -15,9 +16,15 @@ using System.Windows.Media;
 
 namespace Autoaccept_electrical_app
 {
+  /// <summary>
+  /// Главное окно: выбор шаблона, параметры, предпросмотр таблицы и сохранение DOCX.
+  /// </summary>
   public partial class MainWindow : Window
   {
+    /// <summary>Дерево доступных шаблонов документов.</summary>
     public ObservableCollection<TreeNode> Folders { get; set; }
+
+    /// <summary>Excel-файлы из хранилища для выбора источника данных.</summary>
     public ObservableCollection<DataSourceFileItem> DataSourceFiles { get; set; }
 
     private FileClass _current_file = new FileClass();
@@ -27,6 +34,9 @@ namespace Autoaccept_electrical_app
     // Ключ выбранного шаблона: "OJR" или "ZHV"; null — шаблон не выбран
     private string _currentTemplateKey;
 
+    /// <summary>
+    /// Инициализирует интерфейс, дерево шаблонов и список источников данных.
+    /// </summary>
     public MainWindow()
     {
       InitializeComponent();
@@ -37,6 +47,9 @@ namespace Autoaccept_electrical_app
       Activated += (_, __) => ReloadDataSourceFiles();
     }
 
+    /// <summary>
+    /// Обновляет список Excel-файлов в ComboBox, сохраняя текущий выбор.
+    /// </summary>
     private void ReloadDataSourceFiles()
     {
       if (DataSourceFileComboBox == null)
@@ -55,21 +68,56 @@ namespace Autoaccept_electrical_app
       }
     }
 
+    /// <summary>
+    /// Создаёт корневые узлы дерева шаблонов (ОЖР и ЖВК) с подсказками.
+    /// </summary>
     private static ObservableCollection<TreeNode> BuildTemplateTree()
     {
       return new ObservableCollection<TreeNode>
       {
-        new TreeNode { Name = "ОЖР", IsFolder = false, TemplateKey = "OJR" },
-        new TreeNode { Name = "ЖВК", IsFolder = false, TemplateKey = "ZHV" }
+        new TreeNode
+        {
+          Name = "ОЖР",
+          IsFolder = false,
+          TemplateKey = "OJR",
+          ToolTipText =
+            "Общий журнал работ — раздел 3.\n\n" +
+            "Формирует таблицу сведений о выполнении работ в процессе строительства из Excel-файла: " +
+            "даты выполнения, наименования работ с группировкой по разделам.\n\n" +
+            "Настройки: фильтр по разделу (например, АК-1, ЭМ-5), обрезка лишних строк сверху и снизу, " +
+            "подстановка должности и ФИО уполномоченного представителя.\n\n" +
+            "Источник данных — Excel из хранилища «Данные». Результат можно просмотреть в таблице и сохранить в DOCX."
+        },
+        new TreeNode
+        {
+          Name = "ЖВК",
+          IsFolder = false,
+          TemplateKey = "ZHV",
+          ToolTipText =
+            "Журнал входного учёта и контроля качества материалов (ЖВК).\n\n" +
+            "Создаёт таблицу по материалам и конструкциям из Excel: дата доставки, наименование, " +
+            "поставщик, сопроводительные документы, вид и результат контроля, подпись контролирующего лица.\n\n" +
+            "Дополнительно заполняются шапка документа (объект, адрес, организация, даты начала и окончания) " +
+            "и значения по умолчанию для строк: поставщик, вид контроля, результат, ФИО.\n\n" +
+            "Источник данных — Excel из хранилища «Данные». Результат сохраняется в DOCX с оформленной шапкой."
+        }
       };
     }
 
+    /// <summary>
+    /// Фильтрует дерево шаблонов по введённому тексту.
+    /// </summary>
+    /// <param name="sender">Поле поиска шаблонов.</param>
+    /// <param name="e">Аргументы события изменения текста.</param>
     private void SearchTemplatesTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
       _treeSearchFilter.TreeSearchFilter(Folders, SearchTemplatesTextBox.Text);
     }
 
-    private void UpdateZhvPreviewHeader() // обновление заголовков в тектовой части документов
+    /// <summary>
+    /// Синхронизирует текстовую шапку предпросмотра ЖВК с полями формы.
+    /// </summary>
+    private void UpdateZhvPreviewHeader()
     {
             UpdateZhvPreviewHeaderClass.Update(
                 ZhvPreviewObjectName,
@@ -84,6 +132,11 @@ namespace Autoaccept_electrical_app
                 FinishedDateTextBox.Text);
      }
 
+    /// <summary>
+    /// Переключает панель параметров и сбрасывает предпросмотр при смене шаблона.
+    /// </summary>
+    /// <param name="sender">Дерево шаблонов.</param>
+    /// <param name="e">Аргументы события смены выбранного элемента.</param>
     private void TemplatesTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
       var node = e.NewValue as TreeNode;
@@ -112,6 +165,11 @@ namespace Autoaccept_electrical_app
            UpdateZhvPreviewHeader();
     }
 
+        /// <summary>
+        /// Раскрывает или сворачивает папку в дереве шаблонов по клику.
+        /// </summary>
+        /// <param name="sender">Элемент дерева TreeViewItem.</param>
+        /// <param name="e">Аргументы события нажатия кнопки мыши.</param>
         private void TreeViewItem_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
       var item = sender as TreeViewItem;
@@ -130,6 +188,10 @@ namespace Autoaccept_electrical_app
       }
     }
 
+    /// <summary>
+    /// Находит родительский TreeViewItem для элемента визуального дерева.
+    /// </summary>
+    /// <param name="source">Элемент визуального дерева.</param>
     private static TreeViewItem GetTreeViewItemFromSource(DependencyObject source)
     {
       while (source != null)
@@ -143,34 +205,30 @@ namespace Autoaccept_electrical_app
       return null;
     }
 
+        /// <summary>
+        /// Читает Excel через Python, валидирует данные и строит таблицу предпросмотра.
+        /// </summary>
+        /// <param name="sender">Кнопка «Сгенерировать».</param>
+        /// <param name="e">Аргументы события нажатия.</param>
         private void GenerateDocButton_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrEmpty(_currentTemplateKey))
-            {
-                MessageBox.Show("Выберите шаблон документа.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+            TemplateFormFields formFields = CollectFormFields();
+            if (!ValidationDialog.ShowIfInvalid(GenerateDocumentValidator.Validate(formFields)))
                 return;
-            }
 
             DocDataGrid.ItemsSource = null;
             
             int cut_top = 0;
             int cut_bottom = 0;
 
-            if (!int.TryParse(Numeric_up_down_cut_top.Text, out cut_top))
-                cut_top = 0;
-            if (!int.TryParse(Numeric_up_down_cut_bottom.Text, out cut_bottom))
-                cut_bottom = 0;
+            int.TryParse(Numeric_up_down_cut_top.Text?.Trim(), out cut_top);
+            int.TryParse(Numeric_up_down_cut_bottom.Text?.Trim(), out cut_bottom);
 
             if (cut_top < 0) cut_top = 0;
             if (cut_bottom < 0) cut_bottom = 0;
             string pythonExe = ResolveProjectPathClass.ResolveProjectPath("File_extractors", ".venv", "Scripts", "python.exe");
             string extractorPy = ResolveProjectPathClass.ResolveProjectPath("File_extractors", "XLSX_extractor.py");
-            string xlsx = DataSourceFileComboBox.SelectedValue as string;
-            if (xlsx == null) 
-            {
-                MessageBox.Show("Не выбран источник данных.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            } 
+            string xlsx = formFields.DataSourcePath;
             string json = launch_and_data_extraction.launch_script(pythonExe, extractorPy, xlsx);
             if (string.IsNullOrWhiteSpace(json) || json.Trim() == "Ошибки")
             {
@@ -194,14 +252,18 @@ namespace Autoaccept_electrical_app
                 return;
             }
 
+            if (!ValidationDialog.ShowIfInvalid(
+                    GenerateDocumentValidator.ValidateAgainstDocument(formFields, _current_file.json_data, cut_top, cut_bottom)))
+                return;
+
             _current_file.template_key = _currentTemplateKey;
-            string sectionFilter = SectionTextBox.Text?.Trim() ?? "";
+            string sectionFilter = formFields.SectionFilter ?? "";
 
             try
             {
                 if (_currentTemplateKey == "OJR")
                 {
-                    string positionFio = PositionFioTextBox.Text?.Trim() ?? "";
+                    string positionFio = formFields.Fio ?? "";
                     var ojr_tem = new OJR_template();
                     ojr_tem.create_table(DocDataGrid, _current_file.json_data, cut_top, cut_bottom, _current_file, sectionFilter, positionFio);
                 }
@@ -216,9 +278,10 @@ namespace Autoaccept_electrical_app
                         cut_bottom,
                         _current_file,
                         sectionFilter,
-                        ControlTypeTextBox.Text,
-                        ControlResultTextBox.Text,
-                        InspectorFioTextBox.Text);
+                        formFields.Supplier,
+                        formFields.ControlType,
+                        formFields.ControlResult,
+                        formFields.Fio);
                 }
                 else
                 {
@@ -236,6 +299,11 @@ namespace Autoaccept_electrical_app
             }
         }
 
+        /// <summary>
+        /// Выбирает Excel-файл и добавляет его в хранилище при необходимости.
+        /// </summary>
+        /// <param name="sender">Кнопка выбора файла.</param>
+        /// <param name="e">Аргументы события нажатия.</param>
         private void ChooseFileSourceButton_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new Dialogs();
@@ -263,28 +331,69 @@ namespace Autoaccept_electrical_app
         }
 
 
-        // логика для numeric
+        /// <summary>Увеличивает значение «Обрезать сверху» на 1.</summary>
+        /// <param name="sender">Кнопка «+».</param>
+        /// <param name="e">Аргументы события нажатия.</param>
         private void Numeric_top_up_button_Click(object sender, RoutedEventArgs e)
         {
             Numeric_Change_Class.Numeric_change(Numeric_up_down_cut_top, 1);
         }
 
+        /// <summary>Уменьшает значение «Обрезать сверху» на 1.</summary>
+        /// <param name="sender">Кнопка «−».</param>
+        /// <param name="e">Аргументы события нажатия.</param>
         private void Numeric_top_down_button_Click(object sender, RoutedEventArgs e)
         {
             Numeric_Change_Class.Numeric_change(Numeric_up_down_cut_top, -1);
         }
 
+        /// <summary>Увеличивает значение «Обрезать снизу» на 1.</summary>
+        /// <param name="sender">Кнопка «+».</param>
+        /// <param name="e">Аргументы события нажатия.</param>
         private void Numeric_bottom_up_button_Click(object sender, RoutedEventArgs e)
         {
             Numeric_Change_Class.Numeric_change(Numeric_up_down_cut_bottom, 1);
         }
 
+        /// <summary>Уменьшает значение «Обрезать снизу» на 1.</summary>
+        /// <param name="sender">Кнопка «−».</param>
+        /// <param name="e">Аргументы события нажатия.</param>
         private void Numeric_bottom_down_button_Click(object sender, RoutedEventArgs e)
         {
             Numeric_Change_Class.Numeric_change(Numeric_up_down_cut_bottom, -1);
         }
 
-        // Метаданные с префиксом «_» попадают в JSON и читаются DOCX_table_builder.py (не в таблицу)
+        /// <summary>
+        /// Собирает значения полей формы в объект для валидации и генерации.
+        /// </summary>
+        private TemplateFormFields CollectFormFields()
+        {
+            return new TemplateFormFields
+            {
+                TemplateKey = _currentTemplateKey,
+                DataSourcePath = DataSourceFileComboBox.SelectedValue as string,
+                CutTopText = Numeric_up_down_cut_top.Text?.Trim(),
+                CutBottomText = Numeric_up_down_cut_bottom.Text?.Trim(),
+                SectionFilter = SectionTextBox.Text?.Trim(),
+                Fio = _currentTemplateKey == "ZHV"
+                    ? InspectorFioTextBox.Text?.Trim()
+                    : PositionFioTextBox.Text?.Trim(),
+                PositionFio = PositionFioTextBox.Text?.Trim(),
+                ObjectName = ObjectNameTextBox.Text?.Trim(),
+                ObjectAddress = ObjectAddressTextBox.Text?.Trim(),
+                Organization = OrganizationTextBox.Text?.Trim(),
+                StartedDate = StartedDateTextBox.Text?.Trim(),
+                FinishedDate = FinishedDateTextBox.Text?.Trim(),
+                Supplier = SupplierTextBox.Text?.Trim(),
+                ControlType = ControlTypeTextBox.Text?.Trim(),
+                ControlResult = ControlResultTextBox.Text?.Trim(),
+                InspectorFio = InspectorFioTextBox.Text?.Trim()
+            };
+        }
+
+        /// <summary>
+        /// Формирует служебные поля шапки DOCX (ключи с «_») для Python-сборщика.
+        /// </summary>
         private Dictionary<string, string> BuildSaveMetadata()
         {
             var metadata = new Dictionary<string, string>
@@ -304,13 +413,17 @@ namespace Autoaccept_electrical_app
             return metadata;
         }
 
+        /// <summary>
+        /// Сохраняет таблицу предпросмотра в DOCX через Python-сборщик.
+        /// </summary>
+        /// <param name="sender">Кнопка «Сохранить».</param>
+        /// <param name="e">Аргументы события нажатия.</param>
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_current_file.table_data == null || _current_file.table_data.Rows.Count == 0)
-            {
-                MessageBox.Show("Нет данных для сохранения. Сначала сгенерируйте документ.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+            TemplateFormFields formFields = CollectFormFields();
+            if (!ValidationDialog.ShowIfInvalid(
+                    SaveDocumentValidator.Validate(_current_file.table_data, _current_file.template_key, formFields)))
                 return;
-            }
 
             Dialogs dialog_manager = new Dialogs();
             if (!dialog_manager.SaveFileDialog())
@@ -342,6 +455,11 @@ namespace Autoaccept_electrical_app
             }
         }
 
+        /// <summary>
+        /// Открывает окно управления хранилищем данных.
+        /// </summary>
+        /// <param name="sender">Кнопка перехода в хранилище.</param>
+        /// <param name="e">Аргументы события нажатия.</param>
         private void MoveToStorageButton_Click(object sender, RoutedEventArgs e)
         {
             var storage_window = new StorageWindow();

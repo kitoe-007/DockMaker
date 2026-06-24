@@ -8,8 +8,16 @@ using System.Windows.Controls;
 
 namespace Autoaccept_electrical_app.classes
 {
+    /// <summary>
+    /// Изменение числовых полей обрезки строк кнопками «+» и «−».
+    /// </summary>
     internal class Numeric_Change_Class
     {
+        /// <summary>
+        /// Увеличивает или уменьшает значение в TextBox на заданную величину (не ниже 0).
+        /// </summary>
+        /// <param name="numeric">Поле ввода числа.</param>
+        /// <param name="delta">Шаг изменения (+1 или −1).</param>
         public static void Numeric_change(TextBox numeric, int delta)
         {
             if (numeric.Text != "") {
