@@ -11,6 +11,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace Autoaccept_electrical_app
 {
@@ -21,6 +22,7 @@ namespace Autoaccept_electrical_app
 
     private FileClass _current_file = new FileClass();
     private readonly TreeSearchFilterClass _treeSearchFilter = new TreeSearchFilterClass();
+    private readonly StorageTreeServiceClass _storageTreeService = new StorageTreeServiceClass();
 
     // Ключ выбранного шаблона: "OJR" или "ZHV"; null — шаблон не выбран
     private string _currentTemplateKey;
@@ -31,6 +33,26 @@ namespace Autoaccept_electrical_app
       Folders = BuildTemplateTree(); // создание дерева шаблонов
       DataSourceFiles = new ObservableCollection<DataSourceFileItem>();
       DataContext = this;
+      ReloadDataSourceFiles();
+      Activated += (_, __) => ReloadDataSourceFiles();
+    }
+
+    private void ReloadDataSourceFiles()
+    {
+      if (DataSourceFileComboBox == null)
+        return;
+
+      string selectedPath = DataSourceFileComboBox.SelectedValue as string;
+
+      DataSourceFiles.Clear();
+      foreach (DataSourceFileItem item in _storageTreeService.LoadDataSourceFiles())
+        DataSourceFiles.Add(item);
+
+      if (!string.IsNullOrEmpty(selectedPath)
+          && DataSourceFiles.Any(file => file.FullPath == selectedPath))
+      {
+        DataSourceFileComboBox.SelectedValue = selectedPath;
+      }
     }
 
     private static ObservableCollection<TreeNode> BuildTemplateTree()
@@ -95,10 +117,30 @@ namespace Autoaccept_electrical_app
       var item = sender as TreeViewItem;
       if (item?.DataContext is TreeNode node && node.IsFolder && node.Children.Count > 0)
       {
+        if (e.OriginalSource is DependencyObject source)
+        {
+          var clickedItem = GetTreeViewItemFromSource(source);
+          if (clickedItem != null && clickedItem != item)
+            return;
+        }
+
         item.IsExpanded = !item.IsExpanded;
         item.IsSelected = true;
         e.Handled = true;
       }
+    }
+
+    private static TreeViewItem GetTreeViewItemFromSource(DependencyObject source)
+    {
+      while (source != null)
+      {
+        if (source is TreeViewItem treeViewItem)
+          return treeViewItem;
+
+        source = VisualTreeHelper.GetParent(source);
+      }
+
+      return null;
     }
 
         private void GenerateDocButton_Click(object sender, RoutedEventArgs e)
@@ -196,15 +238,28 @@ namespace Autoaccept_electrical_app
 
         private void ChooseFileSourceButton_Click(object sender, RoutedEventArgs e)
         {
-            Dialogs dialog_manager = new Dialogs();
-            if (!dialog_manager.OpenFileDialog())
+            var dialog = new Dialogs();
+            if (!dialog.OpenFileDialog())
                 return;
 
-            string filePath = dialog_manager.FilePath;
-            if (!DataSourceFiles.Any(f => f.FullPath == filePath))
-                DataSourceFiles.Add(new DataSourceFileItem(filePath));
+            string filePath = dialog.FilePath;
 
-            DataSourceFileComboBox.SelectedValue = filePath;
+            if (_storageTreeService.IsPathInDataStorage(filePath))
+            {
+                ReloadDataSourceFiles();
+                DataSourceFileComboBox.SelectedValue = filePath;
+                return;
+            }
+
+            if (!_storageTreeService.TryAddFile(_storageTreeService.DataRootPath, filePath, out string error))
+            {
+                MessageBox.Show(error, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            string addedFilePath = Path.Combine(_storageTreeService.DataRootPath, Path.GetFileName(filePath));
+            ReloadDataSourceFiles();
+            DataSourceFileComboBox.SelectedValue = addedFilePath;
         }
 
 
@@ -291,7 +346,8 @@ namespace Autoaccept_electrical_app
         {
             var storage_window = new StorageWindow();
             storage_window.Owner = this;
-            storage_window.Show();
+            storage_window.ShowDialog();
+            ReloadDataSourceFiles();
         }
     }
 }

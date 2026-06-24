@@ -249,9 +249,11 @@
                                         <ComboBox Grid.Column="0" Height="24" Margin="0,0,8,0"
                                                   Name="DataSourceFileComboBox"
                                                   ItemsSource="{Binding DataSourceFiles}"
-                                                  DisplayMemberPath="FileName"
+                                                  DisplayMemberPath="DisplayName"
                                                   SelectedValuePath="FullPath"/>
                                         <Button Grid.Column="1" Width="24" Height="24"
+                                                ToolTip="Выбрать файл Excel"
+                                                FontFamily="Segoe MDL2 Assets" Content="&#xE8E5;"
                                                 Click="ChooseFileSourceButton_Click"/>
                                     </Grid>
 
