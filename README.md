@@ -115,20 +115,22 @@
 cd File_extractors
 python -m venv .venv
 .\.venv\Scripts\pip install -r requirements.txt
-pip install pandas openpyxl pymupdf pdfplumber pytesseract opencv-python pillow
 ```
 
-3. Для OCR: в `File_extractors/TessOCR/` уже лежит сборка Tesseract; при необходимости обновите пути в `PDF_extractor.py`.
+3. Для OCR: в `File_extractors/TessOCR/` лежит бинарник Tesseract (не ставится через pip); при необходимости обновите пути в `PDF_extractor.py`.
 4. Положить Excel-файлы в `data/` (или через «Хранилище данных» в приложении), выбрать шаблон ОЖР или ЖВК, указать источник и нажать «Сгенерировать».
 
 ---
 
 ## Зависимости Python
 
-| Модуль | Назначение |
-|--------|------------|
-| `pandas`, `openpyxl` | Чтение Excel (`XLSX_extractor.py`) |
-| `python-docx` | Сборка DOCX (`File_builder/`) |
-| `pymupdf`, `pdfplumber`, `pytesseract`, `opencv-python`, `pillow` | PDF и OCR (`PDF_extractor.py`) |
+Все пакеты перечислены в [`File_extractors/requirements.txt`](File_extractors/requirements.txt):
 
-Файл `File_extractors/requirements.txt` содержит минимальный набор; для полного функционала установите зависимости из таблицы выше.
+| Пакет | Назначение |
+|-------|------------|
+| `pandas`, `openpyxl` | Чтение Excel (`XLSX_extractor.py`) |
+| `python-docx` | Сборка DOCX (`File_builder/DOCX_table_builder.py`) |
+| `pymupdf`, `pdfplumber` | Извлечение текста из PDF (`PDF_extractor.py`) |
+| `pytesseract`, `opencv-python`, `Pillow`, `numpy` | OCR и предобработка изображений (`PDF_extractor.py`) |
+
+Бинарник **Tesseract** поставляется отдельно в `File_extractors/TessOCR/` и в `requirements.txt` не входит.
